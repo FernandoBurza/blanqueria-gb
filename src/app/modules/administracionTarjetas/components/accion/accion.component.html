@@ -1,0 +1,133 @@
+
+<style lang="scss">
+ .container {
+        display: flex;
+        justify-content: center; /* Centra horizontalmente */
+        align-items: center;    /* Centra verticalmente */
+        color: var(--surface-section);         
+      }
+</style>
+<div class="custom-dialog-header pt-2">
+    <i class="pi pi-credit-card pr-2" style="font-size: 2rem; color: #22C55E;"></i>
+    <span>{{this.titulo}}</span>
+</div>
+<p-divider layout="horizontal"></p-divider>
+<div class="grid col-12 pb-0 pt-0 pl-6">
+    <div class="col-12 container">
+        <div style="width:fit-content;">
+        <p *ngIf="accion === 'Nueva'" class="mt-0 mb-1">
+            <p>N° DE TARJETA*:</p>
+            <input class="p-inputtext-sm m-0" type="text" [(ngModel)]="numeroTarjeta" pInputText (input)="limitarTarjeta($event)" [disabled]="accion === 'Modificar' || accion === 'Entregar'" (blur)="validarTarjeta(numeroTarjeta)"/>
+            <div><small *ngIf="numeroTarjetaError" class="p-error">{{ numeroTarjetaError }}</small></div>           
+        </div>
+    </div>
+</div>
+<div class="grid col-12 pl-6">
+    <div class="col-6 container m-0 p-0">
+        <div>
+            <p>RUBRO*:</p>
+            <p-radioButton name="rubro" value="Prestador" [(ngModel)]="valRadio"  id="prestador"></p-radioButton>
+            <label for="prestador" class="pr-3" style="font-weight: 500;">Prestador</label>
+            <p-radioButton name="rubro" value="Persona" [(ngModel)]="valRadio" id="persona"></p-radioButton>
+            <label for="persona" style="font-weight: 500;">Persona</label>
+        </div>             
+    </div>
+    <div class="col-6 m-0 p-0">
+        <p>CUENTA-SOCIEDAD*:</p>
+        <div *ngIf="valRadio === 'Prestador'" >
+            <p class="mt-0 mb-1 line-height-1 inline" style="font-size:medium;">
+                <p-autoComplete [(ngModel)]="selectedPrestadoresAdvanced" [suggestions]="filteredPrestadores" (completeMethod)="filterPrestador($event)" field="value" [dropdown]="true"></p-autoComplete><div *ngIf="loading" class="loading-spinner"></div>
+                <div><small *ngIf="prestadorError" class="p-error">{{ prestadorError }}</small></div>
+                           
+        </div>
+        <div *ngIf="valRadio === 'Persona'">
+            <div style="width:fit-content;">
+                <p class="mt-0 mb-1 line-height-1" style="font-size:medium;">
+                <p-autoComplete [(ngModel)]="selectedPersonaAdvanced"  [suggestions]="filteredPersona" (completeMethod)="filterPersona($event)" field="value" [dropdown]="true" ></p-autoComplete>
+                <div><small *ngIf="personaError" class="p-error">{{ personaError }}</small></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="grid col-12 pl-6">  
+    <div class="col-5">
+        <div style="width:fit-content;">
+            <p *ngIf="accion === 'Nueva'" class="mt-0 mb-1 line-height-1" style="font-size:medium;">
+            <p [ngStyle]="{ 'color': deshabilitarMovil ? 'grey' : 'black' }">MÓVIL <i>(Marca y descripción): </i></p>           
+            <input class="p-inputtext-sm" type="text" [(ngModel)]="marcayDescripcion" pInputText maxlength="60" [disabled]="deshabilitarMovil"/> 
+        </div>
+    </div>  
+    <div class="col-3">
+        <p *ngIf="accion === 'Nueva'" class="mt-0 mb-1 line-height-1" style="font-size:medium;">
+        <p [ngStyle]="{ 'color': deshabilitarMovil ? 'grey' : 'black' }">PATENTE*:</p>               
+        <input class="p-inputtext-sm" style="width:120px;" type="text" [(ngModel)]="patente" maxlength="10" pInputText (input)="limitarPatente($event)" [disabled]="deshabilitarMovil"/> 
+        <div><small *ngIf="patenteError" class="p-error">{{ patenteError }}</small></div>
+    </div>
+    <div class="col-3">
+        <p *ngIf="accion === 'Nueva'" class="mt-0 mb-1 line-height-1" style="font-size:medium;">
+        <p [ngStyle]="{ 'color': deshabilitarDocumento ? 'grey' : 'black' }">DOCUMENTO*:</p>         
+        <input class="p-inputtext-sm m-0" [(ngModel)]="documento" pInputText (input)="limitarDocumento($event)" [disabled]="deshabilitarDocumento"/>         
+    </div>
+    <div class="col-12 p-0 m-0 text-center">
+        <small *ngIf="generalError" class="w-full p-error text-center">{{generalError}}</small>
+    </div>
+</div>
+<div class="grid col-12 pb-0 pt-0 pl-6 ">
+    <div class="col-12 container">
+        <div style="width:fit-content;">
+        <p>OBSERVACIONES:</p>
+        <textarea rows="5" cols="50" [(ngModel)]="observacion" placeholder="Escribe alguna referencia" pInputTextarea maxlength="200"></textarea>
+    </div>
+    </div>
+</div>
+<div class="grid col-12 p-0">
+    <div class="col-12 container">
+        <div class="inline pr-2">
+            <button pbutton="" pripple="" label="Guardar" class="p-element p-ripple p-button p-component p-button-success" (click)="guardar()"><span class="p-button-icon p-button-icon-left pi pi-save" aria-hidden="true"></span><span class="p-button-label">Guardar</span><span class="p-ink"></span></button>
+        </div>
+        <div class="inline pr-2">
+            <button pbutton="" pripple="" label="Cancelar" class="p-element p-ripple p-button p-component p-button-danger" (click)="cancelar()"><span class="p-button-icon p-button-icon-left pi pi-ban" aria-hidden="true"></span><span class="p-button-label">Cancelar</span><span class="p-ink"></span></button>
+        </div>
+    </div>
+</div>
+<p-dialog [(visible)]="entregarDialog" header="Guardar" [modal]="true" [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <!--<span>La tarjeta <b><i>{{numeroTarjeta}}</i></b> ha sido creada correctamente.</span>-->
+        <input type="date" [(ngModel)]="fechaEntrega">
+    </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple icon="pi pi-check" class="p-button-text p-button-sm" label="Ok" (click)="entregar()" ></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="messageDialog" [header]="header" [modal]="true" [style]="{width:'555px'}">
+    <div class="flex align-items-center justify-content-center">
+        <div [innerHTML]="messageText"></div>
+    </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple class="p-element p-ripple p-button p-component p-button-primary" label="Ok" (click)="aceptarMensaje()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="confirmarDialog" [header]="header" [modal]="true" [style]="{width:'555px'}">
+    <div class="flex align-items-center justify-content-center">
+        <div [innerHTML]="messageText"></div>
+    </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple class="p-element p-ripple p-button-outlined p-button-info p-button p-component" label="Seguir editando" (click)="seguirEditando()"></button>
+        <button pButton pRipple class="p-element p-ripple p-button p-component p-button-success" label="Aceptar" (click)="confirmar()"></button>
+    </ng-template>    
+</p-dialog>
+
+<p-dialog [(visible)]="aplicarDialog" [header]="header" [modal]="true" [style]="{width:'555px'}">
+    <div class="flex align-items-center justify-content-center">
+        <div [innerHTML]="messageText"></div>
+    </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple class="p-element p-ripple p-button-outlined p-button-info p-button p-component" label="Seguir editando" (click)="seguirEditando()"></button>
+        <button pButton pRipple class="p-element p-ripple p-button p-component p-button-success" label="Aceptar" (click)="aplicar()"></button>
+    </ng-template>    
+</p-dialog>
+
+
+

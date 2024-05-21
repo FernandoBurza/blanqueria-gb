@@ -1,0 +1,30 @@
+.tarjetas-badge {
+    border-radius: var(--border-radius);
+    padding: .25em .5rem;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: x-small;
+    letter-spacing: .3px;
+}
+
+.tarjetas-badge {
+    &.status-Activa {
+        background: #C8E6C9;
+        color: #256029;
+    }
+
+    &.status-Inactiva {
+        background: #FFCDD2;
+        color: #C63737;
+    }
+    
+}
+
+.tarjetas-row {    
+    &.status-Inactiva {
+        background: #f7e8e8;       
+    }
+    
+}
+
+

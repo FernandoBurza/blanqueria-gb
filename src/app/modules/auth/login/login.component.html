@@ -1,0 +1,36 @@
+<div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden" style="background-image: url('assets/general/images/login/fondoLogin.jpg');">    
+    <div class="flex flex-column align-items-center justify-content-center">    
+        <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, #911d22 10%, rgba(33, 150, 243, 0) 30%);">
+            <div class="w-full surface-card py-7 px-5 sm:px-8" style="border-radius:53px">
+                <div class=" text-center mb-5">
+                    <div class="logo">
+                        <img src="assets/general/images/login/isoLogoTipo.svg" alt="Image" height="90" class=" mb-5">
+                    </div>
+                    
+                    <div class="text-3xl font-medium mb-3" style="color:#911d22">¡Bienvenido!</div>
+                    <span class="font-medium" style="color:#911d22">Inicia sesión para continuar</span>
+                </div>
+                <form [formGroup]="loginForm" (ngSubmit)="onLogin()">                   
+                    <label for="user" class="block text-md font-medium mb-2" style="color:#911d22">Usuario</label>
+                    <input id="user" formControlName="user" type="text" placeholder="Tu usuario" pInputText 
+                        class="w-full md:w-23rem mb-5 ng-dirty ng-invalid" style="padding:1rem;" >
+
+                    <label for="password" class="block font-medium text-md mb-2" style="color:#911d22">Clave</label>
+                    <p-password id="password" formControlName="password" placeholder="Tu clave" [feedback]="false" [toggleMask]="true" 
+                     styleClass="mb-5" inputStyleClass="w-full md:w-23rem p-3 ng-dirty ng-invalid"></p-password>  
+                    <div style="max-width: 320px;">
+                        <p-message *ngIf="errorMessage" severity="info" [text]="errorMessage" styleClass="block text-center mb-5" ></p-message>
+                    </div>
+                    <div class="flex align-items-center justify-content-between mb-5 gap-5">
+                        <div class="flex align-items-center">
+                            <p-checkbox id="rememberMe" formControlName="rememberMe" [binary]="true" styleClass="mr-2"></p-checkbox>
+                            <label class="text-md" for="rememberMe" style="color:#911d22">Recordar acceso</label>
+                        </div>
+                        <a class="font-medium no-underline ml-2 text-md text-right cursor-pointer" style="color:#911d22">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    <button pButton pRipple label="Iniciar sesión" [loading]="loading" class="w-full p-3 text-md" style="color:white; background-color: #c1272d;" type="submit"></button>
+                </form>    
+            </div>
+        </div>
+    </div>
+</div>

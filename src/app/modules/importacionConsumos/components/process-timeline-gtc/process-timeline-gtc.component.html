@@ -1,0 +1,18 @@
+
+
+    
+<div *ngIf="signalRService.processingSteps!.length > 0" >
+    
+        <div *ngFor="let item of signalRService.processingSteps" >
+            <div >
+                <span *ngIf="item.isProcessingCompleted === true && item.hasFailed === false" class="text-900 mr-2 font-medium">
+                    Proceso Completado.
+                </span>                                
+                <div *ngIf="item.isProcessingCompleted === false" class="pl-4">
+                    <p style="color: #0c475b;">{{ item.percentage }}% completado</p>                        
+                    <p-progressBar [value]="item.percentage" [showValue]="false" style="width: 100%;"></p-progressBar>
+                </div>
+            </div>                    
+        </div>
+    
+    </div>

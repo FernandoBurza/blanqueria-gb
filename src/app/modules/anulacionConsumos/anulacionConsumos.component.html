@@ -1,0 +1,73 @@
+
+
+     
+<div class="ml-2 mr-2">
+    <p-progressBar mode="indeterminate" [style]="{ height: '6px'}" *ngIf="progressBar"></p-progressBar>
+</div>
+<div class="grid grid-nogutter surface-0" style="border-radius: 10px; min-width: 1150px;"> 
+    <div class="pl-4 pt-2 col-12">
+        <p class="text-xl font-bold" style="color: #0c475b;">> ANULACIÓN DE CONSUMOS</p>
+    </div>                       
+    <div class="col-3 md:col-3" >
+        <div class="p-2">                                    
+            <p class="text-sm font-bold" style="color: #093544;">CUENTA-SOCIEDAD:</p>
+            <div>
+                <p class="mt-0 mb-1 line-height-1 inline" style="font-size:medium;">
+                    <p-autoComplete [(ngModel)]="selectedPrestadoresAdvanced" [suggestions]="filteredPrestadores" (completeMethod)="filterPrestador($event)" field="value" [dropdown]="true" (onSelect)="onPrestadorSelected($event)"></p-autoComplete>
+                    <div><small *ngIf="prestadorError" class="p-error">{{ prestadorError }}</small></div>           
+            </div>                 
+        </div>        
+    </div>    
+    <div class="col-2 md:col-2" >
+        <div class="p-2">                                    
+            <p class="text-sm font-bold" style="color: #093544;">PERIODO:</p>
+            <div>
+                <p class="mt-0 mb-1 line-height-1 inline" style="font-size:medium;">
+                    <p-inputMask mask="99/9999" [(ngModel)]="fechPeri" placeholder="MM/AAAA" (onComplete)="limpiarError()"></p-inputMask>
+                    <div><small *ngIf="fechPeriError" class="p-error">{{ fechPeriError }}</small></div>           
+            </div>                 
+        </div>            
+    </div>       
+    <div class="col-2 md:col-2 pt-5" >        
+        <div class="pr-2">
+            <button class="p-element p-ripple p-button p-component p-button-info" (click)="traerConsumoAnular()"><span class="p-button-icon p-button-icon-left pi pi-search" aria-hidden="true"></span><span class="p-button-label">Consultar</span></button>                                                        
+        </div>      
+    </div>       
+     <div class="col-3 md:col-3 pt-3">
+        <p class="text-sm font-bold pt-2" style="color:#093544;">TOTAL DEL CONSUMO:</p>                                                                                           
+        <div >                                                           
+            <p class="text-sm" style="font-style: italic; color:#093544;">$ {{ impoTota | number:'1.2-2' }}</p>                                       
+        </div>
+    </div> 
+    <div class="col-2 pt-5">
+        <button pButton pRipple icon="pi pi-times" class="p-element p-ripple p-button p-component p-button-danger" [disabled]="this.impoTota === 0" label="ANULAR" (click)="mostrarDialog()" ></button>           
+    </div>
+</div> 
+<div>
+    <div *ngIf="!(this.impoTota === 0)">
+        <p-checkbox class="pb-2 pr-2" label="Imputar NC a otra cuenta?" name="otraCuenta" [(ngModel)]="otraCuenta" [binary]="true" id="ac"></p-checkbox>
+        <div *ngIf="otraCuenta">
+            <p-autoComplete [(ngModel)]="selectedOtrasAdvanced" [suggestions]="filteredOtras" (completeMethod)="filterOtra($event)" field="value" [dropdown]="true" (onSelect)="onOtraSelected($event)"></p-autoComplete>
+            <div><small *ngIf="otraError" class="p-error">{{ otraError }}</small></div>           
+        </div>
+    </div>
+</div>                                       
+<p-dialog [(visible)]="anularDialog" header="ANULAR CONSUMO" [modal]="true" [style]="{width:'450px'}" [closable]="false">
+    <div class="flex align-items-center justify-content-center">
+        <span class="pl-2">Anula el consumo del prestador {{this.selectedPrestador}} con un monto total de: {{this.impoTota}}?</span>
+    </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple icon="pi pi-check" class="p-button-text p-button-sm" label="ACEPTAR" (click)="aceptar()" ></button>        
+        <button pButton pRipple icon="pi pi-times" class="p-button-text p-button-sm" label="CANCELAR" (click)="cancelar()" ></button>
+    </ng-template>
+</p-dialog>
+<p-dialog [(visible)]="messageDialog" header="ANULACION DE CONSUMO" [modal]="true" [style]="{width:'500px'}" [closable]="false">
+    <div class="flex align-items-center justify-content-center p-2">
+        <div [innerHTML]="messageText"></div>
+    </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple icon="pi pi-check" class="p-button-text p-button-sm" label="ACEPTAR" (click)="aceptarMessage()"></button>        
+    </ng-template>
+</p-dialog>
+
+

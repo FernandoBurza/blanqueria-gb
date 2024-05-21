@@ -1,0 +1,94 @@
+ <style lang="scss">
+    .surface-overlay:hover{
+        box-shadow: 0px 5px 7px rgb(83 110 121 / 72%), 
+                    0px 0px 4px rgb(206 150 150 / 5%), 
+                    0px 2px 6px rgb(106 100 128 / 43%);
+    }   
+    img {
+  height: 100%;
+  width: auto;
+}
+</style>
+
+<div class="xs:col-12 sm:col-6 md:col-4 xl:col-2 flex flex-column justify-content-center align-items-center mx-auto mb-3">
+    <img class="w-10rem" src="./assets/layout/images/isoLogoTipo.svg" alt="isotipo">    
+</div>
+
+<div class="col-12 grid align-items-center justify-content-center">
+    <div class="col-6 md:col-6 align-items-center justify-content-center pr-6" style="max-width:fit-content;">
+        <p class="line-height-3 m-0 text-center font-semibold">OPERACIONES</p>
+        <p-divider layout="horizontal" align="center" class="p-element" ></p-divider>
+        <div role="separator" class="p-component p-divider-horizontal p-divider-center">
+            <div class="p-divider-content">
+                <div class="col-6 align-items-center justify-content-center">
+                    <div class="surface-ground col-3 md:col-3 lg:col-3 mb-5 lg:mb-0 p-6 zoomin animation-duration-500 animation-iteration-1 w-14rem h-15rem cursor-pointer transition-duration-300" (click)="redirectMenu('/administracionTarjetas');">
+                        <div class="mb-2 relative ">
+                            <img src="./assets/gtc/images/administracionTarjetas.svg" class="w-full">
+                        </div>
+                        <div class="flex flex-wrap justify-content-center">
+                            <span class="text-md font-medium font-bold">ADMINISTRACIÓN</span>
+                            <span class="text-md mb-3 font-semibold">DE TARJETAS</span>        
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 align-items-center justify-content-center">
+                <div class="surface-ground col-3 md:col-3 lg:col-3 mb-5 lg:mb-0 p-6 zoomin animation-duration-500 animation-iteration-1 w-14rem h-15rem cursor-pointer transition-duration-300" (click)="redirectMenu('/importacionConsumos');">
+                    <div class="mb-2 relative">
+                        <img src="./assets/gtc/images/importacionConsumos.svg" class="w-full">
+                    </div>
+                    <div class="flex flex-wrap justify-content-center">
+                        <span class="text-md font-medium font-bold">IMPORTACIÓN</span>
+                        <span class="text-md mb-3 font-semibold">DE CONSUMOS</span>        
+                    </div>
+                </div>
+            </div>  
+            <div class="col-6 align-items-center justify-content-center">
+                <div class="surface-ground col-3 md:col-3 lg:col-3 mb-5 lg:mb-0 p-6 zoomin animation-duration-500 animation-iteration-1 w-14rem h-15rem cursor-pointer transition-duration-300" (click)="redirectMenu('/anulacionConsumos');">
+                    <div class="mb-2 relative">
+                        <img src="./assets/gtc/images/anulacionConsumos.svg" class="w-full">
+                    </div>
+                    <div class="flex flex-wrap justify-content-center">
+                        <span class="text-md font-medium font-bold">ANULACIÓN</span>
+                        <span class="text-md mb-3 font-semibold">DE CONSUMOS</span>        
+                    </div>
+                </div>
+            </div> 
+        </div>        
+    </div>
+    <div class="col-6 md:col-6 align-items-center justify-content-center pl-6" style="max-width:fit-content;">
+        <p class=" line-height-3 m-0 text-center font-semibold">INFORMES</p>
+        <p-divider layout="horizontal" style="width: fit-content;" align="center" class="p-element"></p-divider>
+        <div role="separator" class="p-component p-divider-horizontal  p-divider-center" style="width: fit-content;" >
+            <div class="p-divider-content">
+                <div class="col-3 align-items-center justify-content-center">
+                    <div class="surface-ground col-4 md:col-3 lg:col-3 mb-5 lg:mb-0 p-6 zoomin animation-duration-500 animation-iteration-1 w-14rem h-15rem cursor-pointer transition-duration-300" (click)="redirectMenu('/liquidaciones');">
+                        <div class="mb-2 relative ">
+                            <img src="./assets/gtc/images/liquidaciones.svg" class="w-full">
+                        </div>
+                        <div class="flex flex-wrap justify-content-center">
+                            <span class="text-md font-medium font-bold">LIQUIDACIONES</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-divider-content">
+                <div class="col-3 align-items-center justify-content-center">
+                    <div class="surface-ground col-4 md:col-3 lg:col-3 mb-5 lg:mb-0 p-6 zoomin animation-duration-500 animation-iteration-1 w-14rem h-15rem cursor-pointer transition-duration-300" (click)="redirectMenu('/ultimosConsumos');">
+                        <div class="mb-2 relative ">
+                            <img src="./assets/gtc/images/ultimosConsumos.svg" class="w-full">
+                        </div>
+                        <div class="flex flex-column align-items-center">
+                            <span class="text-md font-medium font-bold justify-content-center">ÚLTIMOS</span>
+                            <span class="text-md mb-3 font-semibold justify-content-center">CONSUMOS</span>    
+                        </div>
+                    </div>
+                </div> 
+            </div>            
+        </div>  
+    </div>
+</div>
+
+
+
+

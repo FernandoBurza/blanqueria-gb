@@ -1,0 +1,74 @@
+
+<style lang="scss">
+ .container {
+        display: flex;
+        justify-content: center; /* Centra horizontalmente */
+        align-items: center;    /* Centra verticalmente */
+        color: var(--surface-section);         
+      }
+</style>
+<p-progressBar mode="indeterminate" [style]="{ height: '6px' }" *ngIf="progressBar"></p-progressBar>
+<div class="custom-dialog-header pt-2">
+    <i class="pi pi-credit-card pr-2" style="font-size: 2rem; color: #22C55E;"></i>
+    <span>ACCION</span>
+</div>
+<p-divider layout="horizontal"></p-divider>
+<div class="grid col-12 pb-0 pt-0 pl-6">
+    <div class="col-12 container">
+        <div style="width:fit-content;">
+            <!--<p>N° DE TARJETA*:</p>
+            <input class="p-inputtext-sm m-0" type="text" [(ngModel)]="numeroTarjeta" pInputText/> 
+            <div><small *ngIf="numeroTarjetaError" class="p-error">{{ numeroTarjetaError }}</small></div>-->           
+    </div>
+</div>
+<div class="grid col-12 pl-6">
+    <div class="col-6 container m-0 p-0">
+        <div>
+            <!--
+            <p>RUBRO*:</p>
+            <p-radioButton name="prestador" value="Prestador" [(ngModel)]="valRadio"  id="prestador"></p-radioButton>
+            <label for="prestador" class="pr-3" style="font-weight: 500;">Prestador</label>
+            <p-radioButton name="persona" value="Persona" [(ngModel)]="valRadio" id="persona"></p-radioButton>
+            <label for="persona" style="font-weight: 500;">Persona</label>-->
+        </div>             
+    </div>
+    <div class="col-6 m-0 p-0">
+        <!--
+        <p>CUENTA-SOCIEDAD:</p>
+        <div *ngIf="valRadio === 'Prestador'" >
+            <p class="mt-0 mb-1 line-height-1 inline" style="font-size:medium;">
+                <p-autoComplete [(ngModel)]="selectedPrestadoresAdvanced" [suggestions]="filteredPrestadores" (completeMethod)="filterPrestador($event)" field="value" [dropdown]="true" style="width: 100%;"></p-autoComplete>
+                <div><small *ngIf="prestadorError" class="p-error">{{ prestadorError }}</small></div>           
+        </div>
+        <div *ngIf="valRadio === 'Persona'">
+            <div style="width:fit-content;">
+                <p class="mt-0 mb-1 line-height-1" style="font-size:medium;">
+                <p-autoComplete [(ngModel)]="selectedPersonaAdvanced"  [suggestions]="filteredPersona" (completeMethod)="filterPersona($event)" field="value" [dropdown]="true" ></p-autoComplete>
+                <div><small *ngIf="personaError" class="p-error">{{ personaError }}</small></div>
+            </div>
+        </div>-->
+    </div>
+</div>
+
+<div class="grid col-12 p-0">
+    <div class="col-12 container">
+        <div class="inline pr-2">
+            <button pbutton="" pripple="" label="Guardar" class="p-element p-ripple p-button p-component p-button-success"><span class="p-button-icon p-button-icon-left pi pi-save" aria-hidden="true"></span><span class="p-button-label">Guardar</span><span class="p-ink"></span></button>
+        </div>
+        <div class="inline pr-2">
+            <button pbutton="" pripple="" label="Cancelar" class="p-element p-ripple p-button p-component p-button-danger"><span class="p-button-icon p-button-icon-left pi pi-ban" aria-hidden="true"></span><span class="p-button-label">Cancelar</span><span class="p-ink"></span></button>
+        </div>
+    </div>
+</div>
+<!--
+<p-dialog [(visible)]="guardarDialog" header="Configuracion Guardada" [modal]="true" [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">        
+        <input type="date" [(ngModel)]="fechaEntrega">
+    </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple icon="pi pi-check" class="p-button-text p-button-sm" label="Ok" ></button>
+    </ng-template>
+</p-dialog>-->
+
+
+

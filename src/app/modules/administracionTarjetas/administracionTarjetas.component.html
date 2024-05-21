@@ -1,0 +1,226 @@
+
+
+<div class="ml-2 mr-2">
+    <p-progressBar mode="indeterminate" [style]="{ height: '6px'}" *ngIf="progressBar && accion !== 'Nueva'"></p-progressBar>
+</div>
+<div class="grid grid-nogutter surface-0" style="border-radius: 10px; min-width: 1150px;">     
+    <div class="pl-4 pt-2">
+        <p class="text-xl font-bold" style="color: #0c475b;">> ADMINISTRACIÓN DE TARJETAS</p>
+    </div>                           
+    <div class="col-12 md:col-12" >
+        <div class="p-2">                                    
+            <p-table #dtTarjetas [value]="tarjetas" dataKey="numeTarj" [rows]="20" selectionMode="single" [rowHover]="true" styleClass="p-datatable-gridlines" [paginator]="false" [globalFilterFields]="['numeTarj','sociedad','numePres', 'pateMovi', 'estado']" responsiveLayout="scroll" [tableStyle]="{'min-width': '30rem'}" [scrollable]="true" scrollHeight="330px" (onRowSelect)="onRowSelect($event)" [(selection)]="selectedRow">
+                <ng-template pTemplate="caption">
+                    <div class="grid col-12 ">
+                        <div class="col-9" style="display: flex; flex-wrap: nowrap;">
+                            <div class="inline pr-2">
+                                <button class="p-element p-ripple p-button p-component p-button-success" (click)="show('Nueva')"><span class="p-button-icon p-button-icon-left pi pi-plus" aria-hidden="true"></span><span class="p-button-label">Nueva</span></button>
+                            </div>
+                            <div class="inline pr-2">
+                                <button class="p-element p-ripple p-button p-component p-button-primary" [disabled]="!this.seleccionada" (click)="show('Modificar')"><span class="p-button-icon p-button-icon-left pi pi-pencil" aria-hidden="true"></span><span class="p-button-label">Modificar</span></button>
+                            </div>
+                            <div class="inline pr-2">
+                                <button class="p-element p-ripple p-button p-component p-button-danger" [disabled]="!this.seleccionada" (click)="show('Baja')"><span class="p-button-icon p-button-icon-left pi pi-trash" aria-hidden="true"></span><span class="p-button-label" style="white-space: nowrap;">Dar de Baja</span></button>
+                            </div>
+                            <div class="inline pr-2">
+                                <button class="p-element p-ripple p-button p-component p-button-info" [disabled]="!this.seleccionada || !this.habilitarEntrega" (click)="show('Entregar')"><span class="p-button-icon p-button-icon-left pi pi-arrow-up-right" aria-hidden="true"></span><span class="p-button-label">Entregar</span></button>
+                            </div>
+                            <div class="inline pr-2">
+                                <button class="p-element p-ripple p-button p-component p-button-secondary" [disabled]="!this.seleccionada || this.habilitarEntrega" (click)="show('Recibir')"><span class="p-button-icon p-button-icon-left pi pi-arrow-down" aria-hidden="true"></span><span class="p-button-label">Recibir</span></button>
+                            </div>                                
+                            <div class="inline pr-4">
+                                <button class="p-element p-ripple p-button-outlined p-button-info p-button p-component" [disabled]="!this.seleccionada || this.habilitarEntrega" (click)="consumos()"><span class="p-button-icon p-button-icon-left pi pi-money-bill" aria-hidden="true"></span><span class="p-button-label">Consumos</span></button>   
+                            </div>
+                            <div class="inline pl-1">
+                                <p-checkbox class="pb-2 pr-2" label="ACTIVAS" name="activas" #filter (onChange)="onStatusFilter(dtTarjetas)" [binary]="true" [(ngModel)]="activasCheck" id="ac"></p-checkbox>
+                                <p-checkbox class="pb-2" label="INACTIVAS" name="inactivas" #filter (onChange)="onStatusFilter(dtTarjetas)" [binary]="true" [(ngModel)]="inactivasCheck" id="in"></p-checkbox>
+                            </div>                                  
+                        </div>                        
+                        <div class="col-2">
+                            <span class="p-input-icon-right ">
+                                <i class="pi pi-search"></i>                                    
+                                <input pInputText type="text" [(ngModel)]="filtro" #filter (input)="onGlobalFilter(dtTarjetas)"  style="width:180px;" />                                        
+                            </span> 
+                        </div>
+                        <div class="col-1">
+                            <p-button (click)="limpiarConsulta()">
+                                <i class="pi pi-refresh"></i>
+                            </p-button>
+                        </div>
+                    </div>  
+                </ng-template>
+                <ng-template pTemplate="header">                            
+                    <tr>                                                           
+                        <th pSortableColumn="numeTarj" style="min-width: 100px;" >N° DE TARJETA <p-sortIcon field="numeTarj"></p-sortIcon></th>
+                        <th pSortableColumn="sociedad" style="min-width: 120px;">SOCIEDAD <p-sortIcon field="sociedad"></p-sortIcon></th>
+                        <th pSortableColumn="numePres" style="min-width: 100px;">CUENTA <p-sortIcon field="numePres"></p-sortIcon></th>
+                        <th pSortableColumn="rubro" style="min-width: 100px;">RUBRO <p-sortIcon field="rubro"></p-sortIcon></th>
+                        <th >UBICACIÓN</th>
+                        <th pSortableColumn="numeDocu">DNI <p-sortIcon field="numeDocu"></p-sortIcon></th>
+                        <th pSortableColumn="pateMovi" style="min-width: 80px;">PATENTE <p-sortIcon field="patente"></p-sortIcon></th>
+                        <th pSortableColumn="nombMovi">MOVIL <p-sortIcon field="nombMovi"></p-sortIcon></th>
+                        <th >ESTADO</th>      
+                        <th></th>                                                       
+                    </tr>                                                                    
+                </ng-template>                                     
+                <ng-template pTemplate="body" let-tarjeta>
+                    <tr [pSelectableRow]="tarjeta" [class]="'tarjetas-row status-' + tarjeta.estado" >
+                        <td>
+                            {{tarjeta.numeTarj}}
+                        </td>
+                        <td>
+                            {{tarjeta.sociedad}}
+                        </td>
+                        <td>
+                            {{tarjeta.numePres}}
+                        </td>
+                        <td>
+                            {{tarjeta.rubro}}
+                        </td>
+                        <td>
+                            {{tarjeta.fechEntr ? 'Usuario':'En SOS'}}
+                        </td>
+                        <td>
+                            {{tarjeta.numeDocu}}
+                        </td>
+                        <td>
+                            {{tarjeta.pateMovi}}
+                        </td>
+                        <td>
+                            {{tarjeta.nombMovi}}
+                        </td>
+                        <td>
+                            <span [class]="'tarjetas-badge status-' + tarjeta.estado">{{tarjeta.estado}}</span>
+                        </td>
+                        <td style="display: none;">{{tarjeta.descTarj}}</td>
+                        <td class="text-left">
+                            <button class="p-link layout-topbar-menu-button layout-topbar-button" (click)="show('Clonar', tarjeta)">
+                                <i class="pi pi-copy" style="color:gray"></i>
+                            </button>                                
+                        </td>                                                                           
+                    </tr>
+                </ng-template>
+            </p-table>                    
+        </div>        
+    </div>       
+    <div *ngIf="!seleccionada" class="col-3 md:col-3 pl-3">                                                                 
+        <div class="card surface-0">
+            <p  class="pt-2 pl-2 text-sm mb-2 text-center font-bold" style="color:#093544;">HISTORIAL DE LA TARJETA</p>                                 
+            <div class="text-center">
+                <i class="pi pi-credit-card pi-creditcard" style="color:#093544; width: 100px;"></i>
+            </div>
+            <p class="ml-2 text-sm font-bold text-center" style="font-style: italic; color:#76a4b8;"> NO SELECCIONADA</p>                                       
+        </div>            
+    </div>   
+    <div *ngIf="seleccionada" class="col-12 pl-3">       
+        <p  class="pt-1 pl-2 text-sm mb-2 font-bold" style="color:#093544;">HISTORIAL DE LA TARJETA SELECCIONADA</p>                                                                                           
+        <div class="surface-0">
+            <div class="grid col-12 p-0">
+                <div class="col-2">                        
+                    <div class="text-center">
+                        <i class="pi pi-credit-card pi-creditcard" style="color:#093544; width: 100px;"></i>
+                    </div>                      
+                    <p class="ml-2 text-sm font-bold text-center" style="font-style: italic; color:#76a4b8;">{{numeroTarjeta}}</p>                                       
+                </div>
+                <div class="col-6 p-1">
+                    <p-table [value]="tarjetaHistorico"  [rows]="5" styleClass="p-datatable-gridlines" responsiveLayout="scroll" [tableStyle]="{'max-width': '41.5rem'}" [scrollable]="true" scrollHeight="300px" >                        
+                        <ng-template pTemplate="header">                            
+                            <tr>                                    
+                                <th style="width: 67px;">SOCIEDAD</th>
+                                <th style="width: 25px;">CUENTA</th>                                   
+                                <th style="width: 25px;">ENTREGA</th> 
+                                <th style="width: 25px;">DEVOLUCIÓN</th>                                                             
+                            </tr>                                                                    
+                        </ng-template>                                     
+                        <ng-template pTemplate="body" let-item>
+                            <tr>                                
+                                <td>
+                                    {{item.sociedad}}
+                                </td>
+                                <td>
+                                    {{item.numePres}}
+                                </td>                                
+                                <td>
+                                    {{item.fechEntr}}
+                                </td>
+                                <td>
+                                    {{item.fechDevo}}
+                                </td>                                                                                                       
+                            </tr>
+                        </ng-template>
+                    </p-table> 
+                </div>
+                <div class="col-4">
+                    <p class="pt-1 pl-2 mb-2 font-bold" style="color:#093544; text-align: left; font-size: 8pt;">OBSERVACIONES:</p>
+                    <p class="pt-1 pl-2 mb-2" style="color:black; text-align: left; font-size: 8pt; font-style: italic;">{{observacion}}</p>
+                </div>
+            </div>
+        </div>            
+    </div>                                        
+</div>    
+
+<p-dialog [(visible)]="entregarDialog" header="ENTREGAR  TARJETA" [modal]="true" [style]="{width:'450px'}" [closable]="false">
+    <div class="flex align-items-center justify-content-center">
+        <input type="date" [(ngModel)]="fechaEntrega">
+    </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple icon="pi pi-check" class="p-button-text p-button-sm" label="ACEPTAR" (click)="entregar()" ></button>
+        <button pButton pRipple icon="pi pi-times" class="p-button-text p-button-sm" label="CANCELAR" (click)="cancelar('entregar')" ></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="recibirDialog" header="RECIBIR TARJETA" [modal]="true" [style]="{width:'450px'}" [closable]="false">
+    <div class="flex align-items-center justify-content-center">
+        <input type="date" [(ngModel)]="fechaDevolucion">
+    </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple icon="pi pi-check" class="p-button-text p-button-sm" label="ACEPTAR" (click)="recibir()" ></button>
+        <button pButton pRipple icon="pi pi-times" class="p-button-text p-button-sm" label="CANCELAR" (click)="cancelar('recibir')" ></button>
+    </ng-template>
+</p-dialog>
+<p-dialog [(visible)]="confirmDialog" header="CONFIRMAR TRANSFERENCIA" [modal]="true" [style]="{width:'450px'}" [closable]="false">
+    <div class="flex align-items-center justify-content-center" style="flex-direction: column;">
+        <div>Existen consumos pendientes de <b><i>{{consumosResponse.impoTota}}</i></b> desde <b><i>{{ consumosResponse.fechPeri | date: 'dd/MM/yyyy' }}</i></b>.</div>
+        <div>¿Desea transferirlos a este prestador?</div>
+     </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple icon="pi pi-check" class="p-button-text p-button-sm" label="ACEPTAR" (click)="confirmaTransferencia()" ></button>
+        <button pButton pRipple icon="pi pi-times" class="p-button-text p-button-sm" label="CANCELAR" (click)="cancelar('transferencia')" ></button>
+    </ng-template>
+</p-dialog>
+<p-dialog [(visible)]="messageDialog" header="Informacion" [modal]="true" [style]="{width:'450px'}" [closable]="false">
+    <div class="flex align-items-center justify-content-center">
+        <span>{{messageText}}</span>
+    </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple icon="pi pi-check" class="p-button-text p-button-sm" label="ACEPTAR" (click)="aceptar(accion)" ></button>        
+    </ng-template>
+</p-dialog>
+<p-dialog [(visible)]="bajaDialog" header="CONFIRMAR BAJA DE TARJETA" [modal]="true" [style]="{width:'450px'}" [closable]="false">
+    <div class="flex align-items-center justify-content-center">
+        <span>Desea <b>dar de baja</b> la Tarjeta <b>N° {{tarjetaSeleccionada.numeTarj}}</b>?</span>
+    </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple icon="pi pi-check" class="p-button-text p-button-sm" label="ACEPTAR" (click)="aceptar('baja')" ></button>        
+        <button pButton pRipple icon="pi pi-times" class="p-button-text p-button-sm" label="CANCELAR" (click)="cancelar('baja')" ></button>
+    </ng-template>
+</p-dialog>
+<p-dialog [(visible)]="transferirDialog" header="ENTREGAR TARJETA" [modal]="true" [style]="{width:'450px'}" [closable]="false">
+    <div class="flex align-items-center justify-content-center" style="flex-direction: column;">
+        <div>Ingrese la fecha desde la cual quiere transferir los consumos pendientes.</div>
+        <div><input type="date" [(ngModel)]="fechaTransferencia"></div>
+    </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple icon="pi pi-check" class="p-button-text p-button-sm" label="ACEPTAR" (click)="transferir()" ></button>
+        <button pButton pRipple icon="pi pi-times" class="p-button-text p-button-sm" label="CANCELAR" (click)="cancelar('transferir')" ></button>
+    </ng-template>
+</p-dialog>
+<p-dialog [(visible)]="aceptarBajaDialog" header="BAJA DE TARJETA" [modal]="true" [style]="{width:'450px'}" [closable]="false">
+    <div class="flex align-items-center justify-content-center">
+        <span>{{messageText}}</span>
+    </div>
+    <ng-template pTemplate="footer">        
+        <button pButton pRipple icon="pi pi-check" class="p-button-text p-button-sm" label="Ok" (click)="aceptarBaja()"></button>
+    </ng-template>
+</p-dialog>
+
