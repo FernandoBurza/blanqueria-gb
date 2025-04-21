@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { UserInfo } from 'firebase/auth';
-import { AuthService } from '../login/services/auth.service';
+import { Component, OnInit } from '@angular/core';
+import { User, onAuthStateChanged, signOut } from 'firebase/auth';
+import { firebaseAuth } from 'src/app/firebase-config';
 import { Router } from '@angular/router';
 
 @Component({
@@ -9,24 +8,26 @@ import { Router } from '@angular/router';
   templateUrl: './perfil.component.html',
   styleUrls: ['./perfil.component.css']
 })
-export class PerfilComponent {
-  user: UserInfo | null = null;
+export class PerfilComponent implements OnInit {
+  user: User | null = null;
   isSignUpMode = false;
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
 
-  constructor(private afAuth: AngularFireAuth, private authService: AuthService, private router: Router) { }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
-    this.afAuth.authState.subscribe((user) => {
+    onAuthStateChanged(firebaseAuth, (user) => {
       this.user = user;
     });
   }
 
   logout() {
-    this.authService.logout();
-    this.router.navigate(['/dashboard']);
+    signOut(firebaseAuth).then(() => {
+      this.router.navigate(['/dashboard']);
+    }).catch((error) => {
+      console.error('Error al cerrar sesión:', error);
+    });
   }
-
 }

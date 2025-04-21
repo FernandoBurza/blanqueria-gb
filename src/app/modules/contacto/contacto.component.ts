@@ -176,14 +176,24 @@ export class ContactoComponent implements OnInit {
                     id: idContacto,
                     localidad: Number(this.selectedLocalidadAdvanced.id)
                 };
-                this.firestoreService.agregarContacto(nuevoContacto)
-                    .then(() => {
+                this.firestoreService.agregarContacto(nuevoContacto).subscribe({
+                    next: (response) => {
+                        // Esto se ejecuta cuando la operación se completa exitosamente
                         console.log('Nuevo contacto guardado');
                         this.messageText = "Datos Guardados!";
                         this.header = "Nuevo";
                         this.messageDialog = true;
                         this.router.navigate(['/contacto', idContacto]);
-                    })
+                    },
+                    error: (error) => {
+                        // Esto se ejecuta si ocurre un error
+                        console.error('Error al guardar el contacto:', error);
+                        this.messageText = 'Error al guardar el contacto: ' + error;
+                        this.header = "Error";
+                        this.messageDialog = true;
+                    }
+                });
+
             })
 
         } else {
@@ -193,10 +203,18 @@ export class ContactoComponent implements OnInit {
             };
 
             this.firestoreService.actualizarContacto(this.formData.id, contactoActualizado)
-                .then(() => {
-                    this.messageText = "Datos Guardados!";
-                    this.header = "Actualizacion";
-                    this.messageDialog = true;
+                .subscribe({
+                    next: () => {
+                        this.messageText = "Datos Guardados!";
+                        this.header = "Actualización";
+                        this.messageDialog = true;
+                    },
+                    error: (err) => {
+                        console.error('Error al actualizar el contacto:', err);
+                        this.messageText = "Hubo un error al guardar los datos.";
+                        this.header = "Error";
+                        this.messageDialog = true;
+                    }
                 });
         }
     }

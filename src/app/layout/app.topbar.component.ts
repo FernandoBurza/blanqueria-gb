@@ -1,9 +1,9 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { LayoutService } from './service/app.layout.service';
 import { NavigationEnd, Router } from '@angular/router';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-
+import { onAuthStateChanged } from 'firebase/auth';
+import { firebaseAuth } from 'src/app/firebase-config';
 
 @Component({
   selector: 'app-topbar',
@@ -19,8 +19,7 @@ export class AppTopBarComponent {
 
   constructor(
     public layoutService: LayoutService,
-    private router: Router,
-    private afAuth: AngularFireAuth  // Inyectar AngularFireAuth
+    private router: Router
   ) {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
@@ -30,15 +29,11 @@ export class AppTopBarComponent {
   }
 
   checkRoute() {
-    if (this.router.url === '/dashboard')
-      this.esDashboard = true;
-    else
-      this.esDashboard = false;
+    this.esDashboard = this.router.url === '/dashboard';
   }
 
   sesionPerfil() {
-
-    this.afAuth.authState.subscribe(user => {
+    onAuthStateChanged(firebaseAuth, (user) => {
       if (user) {
         this.router.navigate(['/perfil']);
       } else {
@@ -48,6 +43,7 @@ export class AppTopBarComponent {
   }
 
   logout() {
+    // Acá podrías usar signOut(firebaseAuth) si querés cerrar sesión real
     this.router.navigate(['/dashboard']);
   }
 }

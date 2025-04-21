@@ -5,24 +5,16 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppLayoutModule } from './layout/app.layout.module';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { ErrorInterceptor } from './shared/interceptors/error.interceptor';
-
 import { LoadingInterceptor } from './shared/interceptors/loading.interceptor';
 import { LoadingService } from './shared/services/loading.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DialogService } from 'primeng/dynamicdialog';
-import { PopupService } from 'src/app/shared/services/popup.service';
+import { PopupService } from './shared/services/popup.service';
 import { CommonModule } from '@angular/common';
-import { environment } from '../environments/environment';
-
-
-// ✅ Importa servicios desde la API modular de Firebase
+import { environment } from 'src/environments/environment';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
-import { AngularFireModule } from '@angular/fire/compat';
-import { AngularFireAuthModule } from '@angular/fire/compat/auth';
-//import { MercadoPagoService } from './shared/services/mercadopago.service';
 
 @NgModule({
   declarations: [
@@ -35,8 +27,8 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
     AppLayoutModule,
     HttpClientModule,
     CommonModule,
-    AngularFireModule.initializeApp(environment.firebaseConfig),  // Usar firebaseConfig correctamente
-    AngularFireAuthModule,
+    provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+    provideFirestore(() => getFirestore()) // Aquí estamos configurando Firestore
   ],
   providers: [
     { provide: LocationStrategy, useClass: HashLocationStrategy },
@@ -45,7 +37,6 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
     LoadingService,
     DialogService,
     PopupService,
-    //MercadoPagoService
   ],
   bootstrap: [AppComponent]
 })

@@ -177,11 +177,14 @@ export class AccionComponent {
             };
 
             // Ahora guardar la venta
-            this.firestoreService.addVenta(venta).then(() => {
-                // Después de guardar la venta, guardar los detalles de la venta
-                this.guardarDetallesVenta(idVenta, this.formData.cuotas, this.formData.total, this.formData.idModalidad);
-            }).catch(error => {
-                console.error('Error al guardar la venta:', error);
+            this.firestoreService.addVenta(venta).subscribe({
+                next: () => {
+                    // Después de guardar la venta, guardar los detalles de la venta
+                    this.guardarDetallesVenta(idVenta, this.formData.cuotas, this.formData.total, this.formData.idModalidad);
+                },
+                error: (error) => {
+                    console.error('Error al guardar la venta:', error);
+                }
             });
         });
 
@@ -208,10 +211,15 @@ export class AccionComponent {
             };
 
             // Guardar el detalle en la colección 'detalleVenta' con el idCuota
-            this.firestoreService.addDetalleVenta(detalleVenta).catch(error => {
-                console.error('Error al guardar el detalle de la venta:', error);
-                this.messageDialog = true;
-                this.messageText = 'Error al guardar el detalle de la venta:' + error;
+            this.firestoreService.addDetalleVenta(detalleVenta).subscribe({
+                next: () => {
+                    // Acción cuando la solicitud se completa exitosamente (puedes dejarlo vacío si no se necesita hacer nada aquí)
+                },
+                error: (error) => {
+                    console.error('Error al guardar el detalle de la venta:', error);
+                    this.messageDialog = true;
+                    this.messageText = 'Error al guardar el detalle de la venta: ' + error;
+                }
             });
         }
 

@@ -1,8 +1,13 @@
 import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';  // Importar Firestore
 import { environment } from '../environments/environment';
 
-// Obtén la configuración de Firebase desde environment.ts
-const firebaseConfig = environment.firebaseConfig;
+// Inicializa la app de Firebase
+export const firebaseApp = initializeApp(environment.firebaseConfig);
 
-// Inicializa Firebase
-export const firebaseApp = initializeApp(firebaseConfig);  // Esto inicializa Firebase
+// Exporta el servicio de autenticación de Firebase (modular)
+export const firebaseAuth = getAuth(firebaseApp);
+
+// Inicializa y exporta Firestore
+export const firebaseFirestore = getFirestore(firebaseApp);  // Inicializar Firestore
