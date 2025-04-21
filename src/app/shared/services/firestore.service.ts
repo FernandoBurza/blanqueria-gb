@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, doc, collectionData, query, where, getDocs, Timestamp, orderBy, getDoc } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { combineLatest, forkJoin, lastValueFrom, Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { Cuotas } from 'src/app/modules/contacto/entities/cuotas';
@@ -14,156 +14,177 @@ import { DetalleContacto } from 'src/app/modules/contacto/entities/detalleContac
 })
 export class FirestoreService {
 
-  constructor(private firestore: Firestore) { }
+  constructor(private firestore: AngularFirestore) { }
+
 
   getLocalidades(): Observable<Localidad[]> {
-    const localidadesCollection = collection(this.firestore, 'localidades');
-    return collectionData(localidadesCollection, { idField: 'id' }) as Observable<Localidad[]>;
+    return this.firestore.collection('localidades').snapshotChanges().pipe(
+      map(snapshot =>
+        snapshot
+          .map(doc => doc.payload.doc.data() as Localidad)
+      )
+    );
   }
 
   getContactoPorId(id: number): Observable<any[]> {
-    const clienteCollection = collection(this.firestore, 'cliente');
-    const q = query(clienteCollection, where('id', '==', id));
-    return from(getDocs(q)).pipe(
-      map(snapshot => snapshot.docs.map(doc => doc.data()))
+    return this.firestore.collection('cliente', ref => ref.where('id', '==', id)).snapshotChanges().pipe(
+      map(snapshot => snapshot.map(doc => doc.payload.doc.data()))
     );
   }
 
   getCuotas(idCliente: number): Observable<Cuotas[]> {
-    const ventasCollection = collection(this.firestore, 'venta');
-    const qVentas = query(ventasCollection, where('idCliente', '==', idCliente));
-
-    return from(getDocs(qVentas)).pipe(
+    return this.firestore.collection('venta', ref => ref.where('idCliente', '==', idCliente)).snapshotChanges().pipe(
       switchMap(ventasSnapshot => {
-        const ventas = ventasSnapshot.docs.map(doc => doc.data() as { idVenta: number });
-
-        const detalleObservables = ventas.map(venta => {
-          const detalleCollection = collection(this.firestore, 'detalleVenta');
-          const qDetalles = query(detalleCollection, where('idVenta', '==', venta.idVenta), orderBy('fechaVencimiento'));
-          return collectionData(qDetalles).pipe(
-            map((detalles: any[]) => {
-              return detalles.map(detalle => ({
-                monto: detalle.montoCuota,
-                fechaVencimiento: (detalle.fechaVencimiento as Timestamp)?.toDate()?.toLocaleDateString('es-AR') || null,
-                pagada: detalle.pagada,
-                fechaPago: (detalle.fechaPago as Timestamp)?.toDate()?.toLocaleDateString('es-AR') || null
-              }) as Cuotas);
-            })
-          );
+        const ventas = ventasSnapshot.map(v => {
+          const data = v.payload.doc.data() as any;
+          return data.idVenta;
         });
+
+        const detalleObservables = ventas.map(idVenta =>
+          this.firestore.collection('detalleVenta', ref => ref.where('idVenta', '==', idVenta).orderBy('fechaVencimiento'))
+            .valueChanges()
+            .pipe(
+              map((detalles: any[]) => {
+                return detalles.map(detalle => ({
+                  monto: detalle.montoCuota,
+                  fechaVencimiento: detalle.fechaVencimiento.toDate()?.toLocaleDateString('es-AR') || null,
+                  pagada: detalle.pagada,
+                  fechaPago: detalle.fechaPago?.toDate()?.toLocaleDateString('es-AR') || null
+                }) as Cuotas);
+              })
+            )
+        );
+
         return combineLatest(detalleObservables);
       }),
       map(detallesPorVenta => detallesPorVenta.flat())
     );
+
   }
 
   getDatosVenta(idCliente: number): Observable<Venta[]> {
-    const ventasCollection = collection(this.firestore, 'venta');
-    const qVentas = query(ventasCollection, where('idCliente', '==', idCliente));
+    return this.firestore.collection('venta', ref => ref.where('idCliente', '==', idCliente))
+      .get()
+      .pipe(
+        switchMap(ventasSnapshot => {
+          const ventas = ventasSnapshot.docs.map(doc => doc.data() as any);
 
-    return from(getDocs(qVentas)).pipe(
-      switchMap(ventasSnapshot => {
-        const ventas = ventasSnapshot.docs.map(doc => doc.data() as any);
+          const ventasObservables = ventas.map(venta => {
+            const idMetodo = String(venta.idMetodo ?? '');
 
-        const ventasObservables = ventas.map(venta => {
-          const metodoDocRef = doc(this.firestore, 'metodosPago', String(venta.idMetodo ?? ''));
-          const metodoDoc$ = from(getDoc(metodoDocRef)).pipe(
-            map(docSnap => docSnap.exists() ? (docSnap.data() as { nombre?: string })?.nombre ?? 'Desconocido' : 'Desconocido'),
-            catchError(err => {
-              console.error('Error al obtener método de pago:', err);
-              return of('Desconocido');
-            })
-          );
+            const metodoDoc$ = this.firestore.collection('metodosPago', ref =>
+              ref.where('id', '==', idMetodo)
+            )
+              .snapshotChanges()
+              .pipe(
+                map(snapshot => {
+                  const doc = snapshot[0]?.payload.doc;
+                  const data = doc?.data() as { nombre?: string } | undefined;
+                  return data?.nombre ?? 'Desconocido';
+                }),
+                catchError(err => {
+                  console.error('Error al obtener método de pago:', err);
+                  return of('Desconocido');
+                })
+              );
 
-          const modalidadDocRef = doc(this.firestore, 'modalidadesPago', String(venta.idModalidad ?? ''));
-          const modalidadDoc$ = from(getDoc(modalidadDocRef)).pipe(
-            map(docSnap => docSnap.exists() ? (docSnap.data() as { nombre?: string })?.nombre ?? 'Desconocida' : 'Desconocida'),
-            catchError(err => {
-              console.error('Error al obtener modalidad:', err);
-              return of('Desconocida');
-            })
-          );
 
-          const detalleCollection = collection(this.firestore, 'detalleVenta');
-          const qDetalles = query(detalleCollection, where('idVenta', '==', venta.idVenta), orderBy('fechaVencimiento'));
-          const cuotas$ = collectionData(qDetalles).pipe(
-            map(cuotas => cuotas.map(cuota => ({
-              ...cuota,
-              fechaVencimiento: (cuota['fechaVencimiento'] as Timestamp)?.toDate?.() ?? null,
-              fechaPago: (cuota['fechaPago'] as Timestamp)?.toDate?.() ?? null
-            })))
-          );
+            const idModalidad = String(venta.idModalidad ?? '');
 
-          return combineLatest([metodoDoc$, modalidadDoc$, cuotas$]).pipe(
-            map(([metodoNombre, modalidadNombre, detalleVenta]) => ({
-              idVenta: venta.idVenta,
-              idCliente: venta.idCliente,
-              metodo: metodoNombre,
-              modalidad: modalidadNombre,
-              cuotas: venta.cuotas ?? 1,
-              total: venta.total ?? 0,
-              detalleVenta: detalleVenta
-            } as Venta))
-          );
-        });
-        return combineLatest(ventasObservables);
-      })
-    );
+            const modalidadDoc$ = this.firestore.collection('modalidadesPago', ref =>
+              ref.where('id', '==', idModalidad)
+            )
+              .snapshotChanges()
+              .pipe(
+                map(snapshot => {
+                  const doc = snapshot[0]?.payload.doc;
+                  const data = doc?.data() as { nombre?: string } | undefined;
+                  return data?.nombre ?? 'Desconocida';
+                }),
+                catchError(err => {
+                  console.error('Error al obtener modalidad:', err);
+                  return of('Desconocida');
+                })
+              );
+            const cuotas$ = this.firestore.collection<DetalleVenta>('detalleVenta', ref =>
+              ref.where('idVenta', '==', venta.idVenta).orderBy('fechaVencimiento')
+            ).valueChanges().pipe(
+              map(cuotas => cuotas.map(cuota => ({
+                ...cuota,
+                fechaVencimiento: cuota.fechaVencimiento?.toDate?.() ?? null,
+                fechaPago: cuota.fechaPago?.toDate?.() ?? null
+              })))
+            );
+
+            return combineLatest([metodoDoc$, modalidadDoc$, cuotas$]).pipe(
+              map(([metodoNombre, modalidadNombre, cuotas]) => ({
+                idVenta: venta.idVenta,
+                idCliente: venta.idCliente,
+                metodo: metodoNombre,
+                modalidad: modalidadNombre,
+                cuotas: venta.cuotas ?? 1,
+                total: venta.total ?? 0,
+                detalleVenta: cuotas
+              } as Venta))
+            );
+          });
+
+          return combineLatest(ventasObservables);
+        })
+      );
   }
 
   getHistorial(): Observable<any[]> {
-    const clientesCollection = collection(this.firestore, 'cliente');
-    return collectionData(clientesCollection, { idField: 'id' }).pipe(
+    return this.firestore.collection<Cliente>('cliente').valueChanges().pipe(
       switchMap(clientes => {
         const historialObservables = clientes.map(cliente => {
-          const localidadDocRef = doc(this.firestore, 'localidades', String(cliente['localidad']));
-          return from(getDoc(localidadDocRef)).pipe(
+          // Primero buscamos la localidad del cliente
+          return this.firestore.collection('localidades').doc(String(cliente.localidad)).get().pipe(
             switchMap(localidadDoc => {
-              const localidadNombre = localidadDoc.exists() ? (localidadDoc.data() as { nombre: string })?.nombre : 'Desconocida';
+              const data = localidadDoc.data() as { nombre: string } | undefined;
+              const localidadNombre = localidadDoc.exists && data ? data.nombre : 'Desconocida';
 
-              const ventasCollection = collection(this.firestore, 'venta');
-              const qVentas = query(ventasCollection, where('idCliente', '==', cliente.id));
-              return from(getDocs(qVentas)).pipe(
+              // Ahora buscamos las ventas del cliente
+              return this.firestore.collection('venta', ref => ref.where('idCliente', '==', cliente.id)).get().pipe(
                 switchMap(ventasSnapshot => {
-                  const ventas = ventasSnapshot.docs.map(doc => doc.data() as { idVenta: number });
+                  const ventas = ventasSnapshot.docs.map(doc => doc.data());
 
+                  // Si no tiene ventas, devolver un valor por defecto
                   if (ventas.length === 0) {
                     return of({
                       id: cliente.id,
-                      nombre: cliente['nombre'],
+                      nombre: cliente.nombre,
                       localidad: localidadNombre,
-                      telefono: cliente['telefono'],
+                      telefono: cliente.telefono,
                       fechaVencimiento: null
                     });
                   }
 
-                  const detalleObservables = ventas.map(venta => {
-                    const detalleCollection = collection(this.firestore, 'detalleVenta');
-                    const qDetalles = query(detalleCollection, where('idVenta', '==', venta.idVenta), where('pagada', '==', false));
-                    return collectionData(qDetalles) as Observable<DetalleVenta[]>;
+                  const detalleObservables = ventas.map((venta: any) => {
+                    return this.firestore.collection<DetalleVenta>('detalleVenta', ref =>
+                      ref.where('idVenta', '==', venta.idVenta).where('pagada', '==', false)
+                    ).valueChanges();
                   });
 
                   return combineLatest(detalleObservables).pipe(
-                    map((cuotasPorVenta: DetalleVenta[][]) => {
+                    switchMap((cuotasPorVenta: DetalleVenta[][]) => {
                       const todasLasCuotas = cuotasPorVenta.flat();
 
-                      if (todasLasCuotas.length === 0) return null;
+                      if (todasLasCuotas.length === 0) return [null];
 
                       const proximaCuota = todasLasCuotas.reduce((min, actual) => {
-                        const fechaMin = (min.fechaVencimiento as Timestamp)?.toDate();
-                        const fechaAct = (actual.fechaVencimiento as Timestamp)?.toDate();
-                        if (!fechaMin) return actual;
-                        if (!fechaAct) return min;
+                        const fechaMin = min.fechaVencimiento.toDate();
+                        const fechaAct = actual.fechaVencimiento.toDate();
                         return fechaAct < fechaMin ? actual : min;
                       });
 
-                      return {
+                      return of({
                         id: cliente.id,
-                        nombre: cliente['nombre'],
+                        nombre: cliente.nombre,
                         localidad: localidadNombre,
-                        telefono: cliente['telefono'],
-                        fechaVencimiento: (proximaCuota.fechaVencimiento as Timestamp)?.toDate()?.toISOString().split('T')[0]
-                      };
+                        telefono: cliente.telefono,
+                        fechaVencimiento: proximaCuota.fechaVencimiento.toDate().toISOString().split('T')[0]
+                      });
                     })
                   );
                 })
@@ -171,98 +192,100 @@ export class FirestoreService {
             })
           );
         });
+
         return combineLatest(historialObservables);
       }),
       map(historial => historial.filter(entry => entry !== null))
     );
   }
 
+
+
   agregarContacto(contacto: DetalleContacto) {
-    const contactoCollection = collection(this.firestore, 'cliente');
-    return addDoc(contactoCollection, contacto);
+    return this.firestore.collection('cliente').add(contacto);
   }
 
-  async actualizarContacto(id: string, contacto: DetalleContacto): Promise<void> {
-    const clienteCollection = collection(this.firestore, 'cliente');
-    const q = query(clienteCollection, where('id', '==', id));
-    const snapshot = await getDocs(q);
-    if (!snapshot.empty) {
-      const docId = snapshot.docs[0].id;
-      const contactoDocRef = doc(this.firestore, 'cliente', docId);
-
-      // Crea un objeto literal con los campos que quieres actualizar
-      const updateData: { [key: string]: any } = {
-        nombre: contacto.nombre,
-        telefono: contacto.telefono,
-        // ... incluye aquí otros campos de DetalleContacto que quieras actualizar
-      };
-
-      return updateDoc(contactoDocRef, updateData);
-    } else {
-      throw new Error('No se encontró el contacto con el id proporcionado.');
-    }
+  actualizarContacto(id: string, contacto: DetalleContacto) {
+    return this.firestore.collection('cliente', ref =>
+      ref.where('id', '==', id)
+    )
+      .get()
+      .toPromise()
+      .then(snapshot => {
+        if (!snapshot!.empty) {
+          const docId = snapshot!.docs[0].id; // ID real del documento
+          return this.firestore.collection('cliente').doc(docId).update(contacto);
+        } else {
+          throw new Error('No se encontró el contacto con el id proporcionado.');
+        }
+      });
   }
 
   addVenta(venta: any) {
-    const ventaDocRef = doc(this.firestore, 'venta', venta.idVenta.toString());
-    return setDoc(ventaDocRef, venta);
+    return this.firestore.collection('venta').doc(venta.idVenta.toString()).set(venta);
   }
 
+  // Función para agregar un detalle de venta
   addDetalleVenta(detalleVenta: any) {
-    const detalleCollection = collection(this.firestore, 'detalleVenta');
-    return addDoc(detalleCollection, detalleVenta);
+    return this.firestore.collection('detalleVenta').add(detalleVenta);
   }
 
-  async updateDetalleVenta(cuotaActualizada: any): Promise<void> {
-    const detalleCollection = collection(this.firestore, 'detalleVenta');
-    const q = query(detalleCollection, where('idCuota', '==', cuotaActualizada.idCuota));
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      querySnapshot.forEach(docSnap => {
-        const docRef = doc(this.firestore, 'detalleVenta', docSnap.id);
-        updateDoc(docRef, {
-          montoCuota: cuotaActualizada.montoCuota,
-          fechaVencimiento: cuotaActualizada.fechaVencimiento, // Asegúrate de que sea un tipo aceptado por Firestore (Timestamp o Date)
-          pagada: cuotaActualizada.pagada,
-          fechaPago: cuotaActualizada.fechaPago
-        });
-      });
-    } else {
-      console.log('No se encontró ningún documento con el idCuota especificado.');
-    }
-  }
-
-  generateId(): Observable<number> {
-    const ventaCollection = collection(this.firestore, 'venta');
-    const q = query(ventaCollection, orderBy('idVenta', 'desc'), limit(1));
-    return from(getDocs(q)).pipe(
-      map(snapshot => {
-        if (!snapshot.empty) {
-          const lastVenta = snapshot.docs[0].data() as { idVenta: number };
-          return lastVenta.idVenta + 1;
+  updateDetalleVenta(cuotaActualizada: any): Promise<void> {
+    return this.firestore.collection('detalleVenta', ref => ref.where('idCuota', '==', cuotaActualizada.idCuota))
+      .get()
+      .toPromise()
+      .then(querySnapshot => {
+        if (!querySnapshot!.empty) {
+          querySnapshot!.forEach(doc => {
+            doc.ref.update({
+              montoCuota: cuotaActualizada.montoCuota,
+              fechaVencimiento: cuotaActualizada.fechaVencimiento,  // Asegúrate de que esta sea una fecha válida
+              pagada: cuotaActualizada.pagada,
+              fechaPago: cuotaActualizada.fechaPago
+            });
+          });
         } else {
-          return 1;
+          console.log('No se encontró ningún documento con el idCuota especificado.');
         }
       })
-    );
+      .catch(error => {
+        console.error('Error al actualizar el detalle de la venta:', error);
+      });
+  }
+
+
+  // Generar un ID único para la venta (puedes utilizar el método de Firebase o crear el tuyo propio)
+  generateId(): Observable<number> {
+    return this.firestore
+      .collection('venta', ref => ref.orderBy('idVenta', 'desc').limit(1))
+      .get()
+      .pipe(
+        map(snapshot => {
+          if (!snapshot.empty) {
+            const lastVenta = snapshot.docs[0].data() as any;
+            return lastVenta.idVenta + 1;  // Devolver el siguiente ID
+          } else {
+            // No hay ventas previas, empezamos con 1
+            return 1;
+          }
+        })
+      );
   }
 
   contactoId(): Observable<number> {
-    const clienteCollection = collection(this.firestore, 'cliente');
-    const q = query(clienteCollection, orderBy('id', 'desc'), limit(1));
-    return from(getDocs(q)).pipe(
-      map(snapshot => {
-        if (!snapshot.empty) {
-          const lastCliente = snapshot.docs[0].data() as { id: number };
-          return lastCliente.id + 1;
-        } else {
-          return 1;
-        }
-      })
-    );
+    return this.firestore
+      .collection('cliente', ref => ref.orderBy('id', 'desc').limit(1))
+      .get()
+      .pipe(
+        map(snapshot => {
+          if (!snapshot.empty) {
+            const lastVenta = snapshot.docs[0].data() as any;
+            return lastVenta.id + 1;  // Devolver el siguiente ID
+          } else {
+            // No hay ventas previas, empezamos con 1
+            return 1;
+          }
+        })
+      );
   }
 }
-
-// Importa las funciones necesarias de la API modular
-import { from } from 'rxjs';
-import { addDoc, setDoc, updateDoc, limit } from '@firebase/firestore';

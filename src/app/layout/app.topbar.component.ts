@@ -2,7 +2,6 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { LayoutService } from './service/app.layout.service';
 import { NavigationEnd, Router } from '@angular/router';
-import { AuthService } from '../modules/auth/login/services/auth.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 
@@ -20,7 +19,6 @@ export class AppTopBarComponent {
 
   constructor(
     public layoutService: LayoutService,
-    private authService: AuthService,
     private router: Router,
     private afAuth: AngularFireAuth  // Inyectar AngularFireAuth
   ) {
@@ -50,7 +48,6 @@ export class AppTopBarComponent {
   }
 
   logout() {
-    this.authService.logout();
     this.router.navigate(['/dashboard']);
   }
 }
