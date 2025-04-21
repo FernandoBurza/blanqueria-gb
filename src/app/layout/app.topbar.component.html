@@ -1,24 +1,16 @@
-<div class="layout-topbar">
-    <a class="layout-topbar-logo mb-3" routerLink="/dashboard" >
-        <img class="pl-6" src="assets/layout/images/logotipo.svg" alt="logo" height="80" style="width:200px">
-    </a>
-    
-    <p-tabMenu *ngIf="!esDashboard" [model]="routeItems" class="pl-7"></p-tabMenu>
-
-    <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button" (click)="layoutService.showProfileSidebar()">
-        <i class="pi pi-ellipsis-v"></i>
-    </button>
-
-    <div #topbarmenu class="layout-topbar-menu" [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
-        <button class="p-link layout-topbar-button" pTooltip="Perfil" routerLink="/dashboard">
-            <i class="pi pi-user"></i>
-            <span>Perfil</span>
-        </button>
-
-        <button class="p-link layout-topbar-button" (click)="logout()">
-            <i class="pi pi-sign-out"></i>
-            <span>Cerrar sesión</span>
-        </button>
+<div class="bg-white">
+    <div class="layout-topbar flex flex-row justify-center">
+        <div class="flex items-center space-x-10">
+            <a
+                routerLink="/tabla-contactos"
+                class="text-gray-500 font-semibold hover:underline text-sm"
+                >INICIO</a
+            >
+            <a
+                routerLink="/contacto"
+                class="text-gray-500 font-semibold hover:underline text-sm"
+                >CLIENTES</a
+            >
+        </div>
     </div>
-
 </div>

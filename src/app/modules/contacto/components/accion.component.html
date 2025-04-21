@@ -1,0 +1,176 @@
+<div class="container mx-auto p-4 max-w-4xl">
+    <!-- Header -->
+    <div class="custom-dialog-header pt-2 mb-4">
+        <span>{{ this.titulo }}</span>
+    </div>
+
+    <!-- Método de Pago -->
+    <div class="mb-4">
+        <label class="block font-semibold text-gray-700">Método de Pago:</label>
+        <p-dropdown
+            id="Metodo"
+            [options]="metodoOptions"
+            [(ngModel)]="selectedMetodo"
+            (onChange)="onMetodoChange($event)"
+            placeholder="Seleccionar"
+        ></p-dropdown>
+    </div>
+
+    <!-- Modalidad de Pago -->
+    <div class="mb-4">
+        <label class="block font-semibold text-gray-700"
+            >Modalidad de Pago:</label
+        >
+        <p-dropdown
+            id="modalidad"
+            [options]="modalidadOptions"
+            [(ngModel)]="selectedModalidad"
+            (onChange)="onModalidadChange($event)"
+            placeholder="Seleccionar"
+        ></p-dropdown>
+    </div>
+
+    <!-- Cantidad de Cuotas -->
+    <div class="mb-4">
+        <label class="block font-semibold text-gray-700"
+            >Cantidad de Cuotas:</label
+        >
+        <p-dropdown
+            id="cuota"
+            [options]="cuotaOptions"
+            [(ngModel)]="selectedCuota"
+            (onChange)="onCuotaChange($event)"
+            placeholder="Seleccionar"
+        ></p-dropdown>
+    </div>
+
+    <!-- Monto Total -->
+    <div class="mb-4">
+        <label class="block font-semibold text-gray-700">Monto Total:</label>
+        <input
+            type="number"
+            class="w-full border border-gray-300 rounded p-2 text-gray-700"
+            [(ngModel)]="formData.total"
+            name="total"
+            (change)="actualizarCuotas()"
+        />
+    </div>
+    <div *ngIf="generalError" class="col-12 container">
+        <small class="p-error">{{ generalError }}</small>
+    </div>
+    <!-- TABLA -->
+    <h2 class="text-xl font-bold mt-8 mb-4 text-gray-800">Pagos Parciales</h2>
+    <table class="w-full border border-gray-300 rounded text-gray-700">
+        <thead class="bg-gray-200">
+            <tr>
+                <th class="p-2 border">Monto Parcial</th>
+                <th class="p-2 border">Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let cuota of cuotas">
+                <td class="p-2 border">$ {{ cuota.monto }}</td>
+                <td class="p-2 border">
+                    {{ cuota.fechaVencimiento }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Botones -->
+    <div class="button-container flex justify-center mt-6 space-x-4">
+        <button
+            class="bg-gray-500 text-white px-6 py-2 rounded-md"
+            (click)="cancelar()"
+        >
+            Cancelar
+        </button>
+        <button
+            class="bg-blue-500 text-white px-6 py-2 rounded-md"
+            (click)="guardar()"
+        >
+            Guardar
+        </button>
+    </div>
+</div>
+
+<!-- Dialogs -->
+<p-dialog
+    #aplicarDialogRef
+    [(visible)]="messageDialog"
+    [header]="header"
+    [modal]="true"
+    [style]="{ width: '555px' }"
+    appPopup
+>
+    <div class="flex align-items-center justify-content-center">
+        <div [innerHTML]="messageText"></div>
+    </div>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            class="p-element p-ripple p-button p-component p-button-primary"
+            label="Ok"
+            (click)="aceptarMensaje()"
+        ></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    #aplicarDialogRef
+    [(visible)]="confirmarDialog"
+    [header]="header"
+    [modal]="true"
+    [style]="{ width: '555px' }"
+    appPopup
+>
+    <div class="flex align-items-center justify-content-center p-3">
+        <div [innerHTML]="messageText"></div>
+    </div>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            class="p-element p-ripple p-button-outlined p-button-info p-button p-component"
+            label="Seguir editando"
+            (click)="seguirEditando()"
+        ></button>
+        <button
+            pButton
+            pRipple
+            class="p-element p-ripple p-button p-component p-button-success"
+            label="Aceptar"
+            (click)="confirmar()"
+        ></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    #aplicarDialogRef
+    [(visible)]="aplicarDialog"
+    [header]="header"
+    [modal]="true"
+    [style]="{ width: '555px' }"
+    appPopup
+>
+    <div class="flex align-items-center justify-content-center p-3">
+        <div [innerHTML]="messageText"></div>
+    </div>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            class="p-element p-ripple p-button-outlined p-button-info p-button p-component"
+            label="Seguir editando"
+            (click)="seguirEditando()"
+        ></button>
+        <button
+            pButton
+            pRipple
+            class="p-element p-ripple p-button p-component p-button-success"
+            label="Aceptar"
+            (click)="aplicar()"
+        ></button>
+    </ng-template>
+</p-dialog>

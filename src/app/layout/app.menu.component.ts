@@ -17,7 +17,7 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'OERACIONES',
                 items: [
-                    { label: 'ADMINISTRACIÓN DE TARJETAS', icon: 'pi pi-fw pi-bookmark', routerLink: ['/administracionTarjetas'] },
+                    { label: 'PANELES MADERA', icon: 'pi pi-fw pi-bookmark', routerLink: ['/paneles-madera'] },
                     { label: 'IMPORTACIÓN DE CONSUMOS', icon: 'pi pi-fw pi-bookmark', routerLink: ['/importacionConsumos'] },                    
                     { label: 'ANULACIÓN DE CONSUMOS', icon: 'pi pi-fw pi-bookmark', routerLink: ['/anulacionCosnumos'] }                    
                 ]

@@ -1,4 +1,4 @@
-.tarjetas-badge {
+.cuentas-badge {
     border-radius: var(--border-radius);
     padding: .25em .5rem;
     text-transform: uppercase;
@@ -7,7 +7,7 @@
     letter-spacing: .3px;
 }
 
-.tarjetas-badge {
+.cuentas-badge {
     &.status-Activa {
         background: #C8E6C9;
         color: #256029;
@@ -20,7 +20,7 @@
     
 }
 
-.tarjetas-row {    
+.cuentas-row {    
     &.status-Inactiva {
         background: #f7e8e8;       
     }

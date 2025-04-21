@@ -21,7 +21,6 @@ import { MessageModule } from 'primeng/message';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { MenuModule } from 'primeng/menu';
-import { RoleGuard } from '../shared/guards/role-guard';
 import { TabMenuModule } from 'primeng/tabmenu'
 
 
@@ -52,7 +51,6 @@ import { TabMenuModule } from 'primeng/tabmenu'
         TabMenuModule  
     ],
     providers: [
-        RoleGuard,
         MessageService
     ],
     exports: [AppLayoutComponent]

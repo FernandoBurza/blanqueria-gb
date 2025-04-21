@@ -1,0 +1,90 @@
+<div class="page-container" *ngIf="!loading; else loadingTemplate">
+    <div class="presentation" *ngIf="presentacionPintura">
+        <div class="presentation-content">
+            <p class="presentation-description">
+                En esta página podrás ver una colección de pinturas al óleo
+                originales, cuidadosamente realizadas a mano, con detalles
+                impresionantes que reflejan la belleza de la naturaleza.
+            </p>
+        </div>
+    </div>
+
+    <h1 class="section-title">COLECCIÓN DE PINTURAS ORIGINALES AL ÓLEO</h1>
+
+    <div class="pinturas-container">
+        <div
+            *ngFor="let pintura of pinturas; let i = index"
+            class="pintura-card"
+        >
+            <div class="pintura-thumbnail-wrapper">
+                <img
+                    [src]="pintura.thumbnailUrl"
+                    [alt]="pintura.titulo"
+                    (click)="openPhotoSwipe(i)"
+                    class="pintura-thumbnail"
+                />
+                <img
+                    *ngFor="let img of pintura.imagenes"
+                    [src]="img.url"
+                    class="full-size-image"
+                    style="display: none"
+                />
+            </div>
+            <div class="pintura-info">
+                <h3 class="pintura-title" [innerHTML]="pintura.titulo"></h3>
+                <button
+                    class="pintura-button"
+                    [routerLink]="['/pinturas', pintura.id]"
+                >
+                    Ver más
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="pswp__bg"></div>
+        <div class="pswp__scroll-wrap">
+            <div class="pswp__container">
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+            </div>
+            <div class="pswp__ui pswp__ui--hidden">
+                <div class="pswp__top-bar">
+                    <div class="pswp__counter"></div>
+                    <button
+                        class="pswp__button pswp__button--close"
+                        title="Cerrar (Esc)"
+                    >
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div
+                    class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"
+                >
+                    <div class="pswp__share-tooltip"></div>
+                </div>
+                <button
+                    class="pswp__button pswp__button--arrow--left"
+                    title="Anterior (izquierda)"
+                >
+                    <span aria-hidden="true">←</span>
+                </button>
+                <button
+                    class="pswp__button pswp__button--arrow--right"
+                    title="Siguiente (derecha)"
+                >
+                    <span aria-hidden="true">→</span>
+                </button>
+                <div class="pswp__caption">
+                    <div class="pswp__caption__center"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #loadingTemplate>
+    <p-progressSpinner></p-progressSpinner>
+</ng-template>

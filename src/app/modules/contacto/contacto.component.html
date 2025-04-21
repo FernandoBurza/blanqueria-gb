@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Formulario de Carga</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-100 p-6">
+        <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
+            <h1 class="text-2xl font-bold mb-6 text-gray-800">
+                Formulario de Carga
+            </h1>
+
+            <!-- FORMULARIO -->
+            <form class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+                <div>
+                    <label class="block font-semibold text-gray-700"
+                        >Nombre y Apellido:</label
+                    >
+                    <input
+                        type="text"
+                        class="w-full border border-gray-300 rounded p-2 text-gray-700"
+                        [(ngModel)]="formData.nombre"
+                        name="nombre"
+                    />
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-gray-700"
+                        >Dirección:</label
+                    >
+                    <input
+                        type="text"
+                        class="w-full border border-gray-300 rounded p-2 text-gray-700"
+                        [(ngModel)]="formData.direccion"
+                        name="direccion"
+                    />
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-gray-700"
+                        >Localidad:</label
+                    >
+                    <p-autoComplete
+                        [(ngModel)]="selectedLocalidadAdvanced"
+                        (onChange)="seleccionOpcion($event)"
+                        [suggestions]="filteredLocalidad"
+                        (completeMethod)="filterLocalidad($event)"
+                        field="nombre"
+                        [dropdown]="true"
+                        placeholder="Seleccionar"
+                        name="localidad"
+                    ></p-autoComplete>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-gray-700"
+                        >N° de Teléfono:</label
+                    >
+                    <input
+                        type="tel"
+                        class="w-full border border-gray-300 rounded p-2 text-gray-700"
+                        [(ngModel)]="formData.telefono"
+                        name="telefono"
+                    />
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block font-semibold text-gray-700"
+                        >Descripción de la Fachada:</label
+                    >
+                    <textarea
+                        class="w-full border border-gray-300 rounded p-2 text-gray-700"
+                        rows="3"
+                        [(ngModel)]="formData.descripcionFachada"
+                        name="descripcionFachada"
+                    ></textarea>
+                </div>
+                <div *ngIf="generalError" class="col-12 container">
+                    <small class="p-error">{{ generalError }}</small>
+                </div>
+            </form>
+
+            <!-- Botones alineados a la derecha -->
+            <div class="mt-4 flex justify-between items-center">
+                <!-- Botón Guardar -->
+                <div class="mr-4">
+                    <button
+                        class="bg-blue-500 text-white px-4 py-2 rounded"
+                        (click)="guardarContacto()"
+                    >
+                        Guardar Contacto
+                    </button>
+                </div>
+
+                <!-- Condición para mostrar Nueva Venta -->
+                <div *ngIf="id">
+                    <div class="inline pr-2">
+                        <button
+                            class="p-element p-ripple p-button p-component p-button-success"
+                            (click)="show()"
+                        >
+                            <span
+                                class="p-button-icon p-button-icon-left"
+                                aria-hidden="true"
+                            ></span>
+                            <span class="p-button-label">Nueva Venta</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Condición para mostrar Nueva Venta y Tabla de Pagos -->
+            <div *ngIf="id">
+                <h2 class="text-xl font-bold mt-8 mb-4 text-gray-800">
+                    Pagos Parciales
+                </h2>
+                <p-table
+                    [value]="ventas"
+                    dataKey="idVenta"
+                    [expandedRowKeys]="expandedRows"
+                    (onRowExpand)="onRowExpand($event)"
+                    (onRowCollapse)="onRowCollapse($event)"
+                    responsiveLayout="scroll"
+                >
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Cuotas</th>
+                            <th>Total</th>
+                            <th>Método</th>
+                            <th>Modalidad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-venta>
+                        <tr>
+                            <td>{{ venta.cuotas }}</td>
+                            <td>$ {{ venta.total }}</td>
+                            <td>{{ venta.metodo }}</td>
+                            <td>{{ venta.modalidad }}</td>
+                            <td>
+                                <button
+                                    pButton
+                                    type="button"
+                                    (click)="toggleRow(venta)"
+                                    [label]="
+                                        isRowExpanded(venta)
+                                            ? 'Ocultar Detalles'
+                                            : 'Ver Detalles'
+                                    "
+                                    class="p-button-sm p-button-secondary"
+                                ></button>
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="rowexpansion" let-venta>
+                        <tr>
+                            <td colspan="5">
+                                <p-table
+                                    [value]="venta.detalleVenta"
+                                    class="p-datatable-sm"
+                                    responsiveLayout="scroll"
+                                >
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th>Monto Parcial</th>
+                                            <th>Fecha Vencimiento</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template
+                                        pTemplate="body"
+                                        let-cuota
+                                        let-i="index"
+                                        let-venta="venta"
+                                    >
+                                        <tr>
+                                            <td>$ {{ cuota.montoCuota }}</td>
+                                            <td>
+                                                {{
+                                                    cuota.fechaVencimiento
+                                                        | date : "dd/MM/yyyy"
+                                                }}
+                                            </td>
+                                            <td class="text-center">
+                                                <button
+                                                    pButton
+                                                    type="button"
+                                                    [disabled]="
+                                                        cuota.pagada ||
+                                                        !cuota.habilitadaParaPagar
+                                                    "
+                                                    (click)="pagarCuota(cuota)"
+                                                    [label]="
+                                                        cuota.pagada
+                                                            ? 'Pagado'
+                                                            : 'Pagar'
+                                                    "
+                                                    [class]="
+                                                        cuota.pagada
+                                                            ? 'p-button-success p-button-sm'
+                                                            : 'p-button-primary p-button-sm'
+                                                    "
+                                                ></button>
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+        <!-- Dialogs -->
+        <p-dialog
+            #aplicarDialogRef
+            [(visible)]="messageDialog"
+            [header]="header"
+            [modal]="true"
+            [style]="{ width: '555px' }"
+            appPopup
+        >
+            <div class="flex align-items-center justify-content-center">
+                <div [innerHTML]="messageText"></div>
+            </div>
+            <ng-template pTemplate="footer">
+                <button
+                    pButton
+                    pRipple
+                    class="p-element p-ripple p-button p-component p-button-primary"
+                    label="Ok"
+                    (click)="aceptarMensaje()"
+                ></button>
+            </ng-template>
+        </p-dialog>
+    </body>
+</html>

@@ -16,11 +16,14 @@ export class DropDownService {
     this.endpoint = `${environment.domain}${this.controller}`;
   }
 
-  get(entidad: string, filtroCompania?: number): Observable<DropDownList[]> {
+  get(entidad: string, filtroCompania?: number, numePresFono?: number): Observable<DropDownList[]> {
     let params = new HttpParams();
     params = params.append('entidad', entidad);
     if (filtroCompania !== null && filtroCompania !== undefined) {
       params = params.append('numeComp', filtroCompania.toString());
+    }
+    if (numePresFono !== null && numePresFono !== undefined) {
+      params = params.append('numePresFono', numePresFono.toString());
     }
 
     return this.http.get<any[]>(`${this.endpoint}/get`, { params });

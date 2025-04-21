@@ -9,18 +9,32 @@ export class LoadingService {
   public loading$ = this.loadingSubject.asObservable();
 
   private requestCount = 0;
+  private ignoreRequests = false; // Añadido para ignorar ciertas solicitudes
 
   startLoading() {
-    if (this.requestCount === 0) {
+    if (this.ignoreRequests) {
+      return;
+    }
+
+    this.requestCount++;
+    if (this.requestCount === 1) {
       this.loadingSubject.next(true);
     }
-    this.requestCount++;
   }
 
   stopLoading() {
+    if (this.ignoreRequests) {
+      return;
+    }
+
     this.requestCount--;
     if (this.requestCount === 0) {
       this.loadingSubject.next(false);
     }
+  }
+
+  // Añadido para configurar si se deben ignorar las solicitudes
+  setIgnoreRequests(ignore: boolean) {
+    this.ignoreRequests = ignore;
   }
 }

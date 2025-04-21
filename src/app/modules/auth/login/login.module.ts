@@ -9,6 +9,9 @@ import { PasswordModule } from 'primeng/password';
 import { InputTextModule } from 'primeng/inputtext';
 import { ReactiveFormsModule } from '@angular/forms'; 
 import { MessageModule } from 'primeng/message';
+import { RegisterModule } from '../register/register.module';
+import { DialogModule } from 'primeng/dialog';
+import { ToastModule } from 'primeng/toast';
 
 @NgModule({
     imports: [
@@ -20,7 +23,10 @@ import { MessageModule } from 'primeng/message';
         FormsModule,
         PasswordModule,
         ReactiveFormsModule,
-        MessageModule
+        MessageModule,
+        RegisterModule,
+        DialogModule,
+        ToastModule
     ],
     declarations: [LoginComponent]
 })

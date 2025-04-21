@@ -1,135 +1,105 @@
-import { Component, HostListener } from '@angular/core';
-import { LayoutService } from 'src/app/layout/service/app.layout.service';
-import { AuthService } from './services/auth.service';
-import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MessageService } from 'primeng/api';
+import { Component } from '@angular/core';
+import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { firebaseApp } from 'src/app/firebase-config';
+import { Router } from '@angular/router';  // Para la redirección
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styles: [` :host ::ng-deep .pi-eye,
-             :host ::ng-deep .pi-eye-slash {
-              transform:scale(1.6);
-              margin-right: 1rem;
-              color: #c1272d !important;
-            }
-          `],
-  providers: [MessageService]
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-
-  loginForm!: FormGroup;
-  rememberMe: boolean = false;
+  email!: string;
   password!: string;
-  errorMessage: string = "";
-  loading: boolean = false;
+  isSignUpMode: boolean = false;
+  confirmPassword!: string;
+  errorMessage: string = '';
+  name!: string;
 
-  constructor(public layoutService: LayoutService, private formBuilder: FormBuilder, private authService: AuthService, private router: Router) { }
-
-  ngOnInit(): void 
-  {
-    this.createReactiveLoginForm();
-    this.verifyCredentials();
+  constructor(private router: Router) {
+    // Firebase ya está inicializado en firebase-config.ts
   }
 
-  @HostListener('window:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
-    if (event.getModifierState('CapsLock')) {
-      this.errorMessage = 'La tecla Bloq Mayús está activada.';
+  login(): void {
+    const auth = getAuth(firebaseApp);  // Asegúrate de usar la instancia de Firebase ya inicializada
+    this.errorMessage = ''; // Resetear mensaje de error antes de cada intento
+    if (this.isSignUpMode) {
+      // Si está en modo de registro, crear una nueva cuenta
+      this.register(auth);
     } else {
-      this.errorMessage = '';
+      // Si está en modo de login, iniciar sesión
+      this.signIn(auth);
     }
   }
 
-  private createReactiveLoginForm(): void
-  {
-    this.loginForm = this.formBuilder.group({
-      user: ['', Validators.required],
-      password: ['', Validators.required],
-      rememberMe: [false]
-    });
+  signIn(auth: any): void {
+    signInWithEmailAndPassword(auth, this.email, this.password)
+      .then((userCredential) => {
+        console.log('User logged in with email:', userCredential.user);
+        this.router.navigate(['/dashboard']);  // Redirigir a otra página después de iniciar sesión
+      })
+      .catch((error) => {
+        console.error('Error during login:', error);
+        this.errorMessage = this.getErrorMessage(error.code);  // Mostrar el error correspondiente
+      });
   }
 
-  public onLogin(): void 
-  {
-    this.validateForm();
-
-    this.loading = true;
-
-    const user = this.loginForm.get('user')?.value;
-    const password = this.loginForm.get('password')?.value;
-
-    this.rememberCredentials(user, password);
-
-    this.authService.login(user, password).subscribe({
-      next: () => {
-        this.successfulLogin();
-      },
-      error: (error: any) => {
-        this.unsuccessfulLogin(error);
-      }
-    });
-  }
-
-  private validateForm(): void
-  {
-    if (this.loginForm.invalid) {
-      this.errorMessage = 'Ingrese usuario y contraseña, por favor!';
-      return;
+  register(auth: any): void {
+    if (this.password !== this.confirmPassword) {
+      this.errorMessage = 'Las contraseñas no coinciden';
+      return;  // No registramos si las contraseñas no coinciden
     }
+
+    createUserWithEmailAndPassword(auth, this.email, this.password)
+      .then((userCredential) => {
+        console.log('User registered:', userCredential.user);
+        // Actualizar el nombre del usuario en Firebase
+        updateProfile(userCredential.user, {
+          displayName: this.name
+        }).then(() => {
+          console.log('Nombre del usuario actualizado');
+        }).catch((error) => {
+          console.error('Error actualizando nombre:', error);
+        });
+        this.router.navigate(['/dashboard']);  // Redirigir a otra página después de registrarse
+      })
+      .catch((error) => {
+        console.error('Error during registration:', error);
+        this.errorMessage = this.getErrorMessage(error.code);  // Mostrar el error correspondiente
+      });
   }
 
-  private successfulLogin(): void 
-  { //Le agrego un segundo de tiempo antes de redirigirse al dashbooard
-    //para que el usuario aprecie el loading del botón Iniciar Sesión
-    setTimeout(() =>{
-      this.loading = false;
-      this.router.navigate(['/dashboard']);
-    }, 1000);
+  loginWithGoogle(): void {
+    const provider = new GoogleAuthProvider();
+    const auth = getAuth(firebaseApp);  // Usa la instancia de Firebase inicializada
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        console.log('User signed in with Google:', result);
+        this.router.navigate(['/dashboard']);  // Redirigir a otra página después de iniciar sesión con Google
+      })
+      .catch((error) => {
+        console.error('Error during Google sign in:', error);
+        this.errorMessage = this.getErrorMessage(error.code);  // Mostrar el error correspondiente
+      });
   }
 
-  private unsuccessfulLogin(error: any): void 
-  {
-    this.loading = false;
-    if (error != null) this.errorMessage = error.error.detail;
+  toggleSignUp() {
+    this.isSignUpMode = !this.isSignUpMode;
   }
 
-  private rememberCredentials(user: string, password: string) : void
-  {
-    this.loginForm.get('rememberMe')?.value ? 
-                   this.setUserLoggedToLocalStorage(user, password, 'true') :
-                   this.setUserLoggedToLocalStorage('', '', '');
-  }
-
-  private verifyCredentials(): void{
-    const userLogged = this.getUserLoggedFromLocalStorage();
-    if(userLogged !== null)
-    {
-      this.loginForm.get('user')?.setValue(userLogged.user);
-      this.loginForm.get('password')?.setValue(userLogged.password);
-      this.loginForm.get('rememberMe')?.setValue(userLogged.rememberMe);
+  // Método para traducir el error de Firebase Auth
+  getErrorMessage(errorCode: string): string {
+    switch (errorCode) {
+      case 'auth/user-not-found':
+        return 'El usuario no existe';
+      case 'auth/wrong-password':
+        return 'Contraseña incorrecta';
+      case 'auth/email-already-in-use':
+        return 'Este correo electrónico ya está en uso';
+      case 'auth/invalid-email':
+        return 'Correo electrónico inválido';
+      default:
+        return 'Ocurrió un error. Inténtalo de nuevo';
     }
-  }
-
-  private setUserLoggedToLocalStorage(user: string, password: string, rememberMe: string): void
-  {
-    localStorage.setItem('user', user);
-    localStorage.setItem('password', password);
-    localStorage.setItem('rememberMe', rememberMe);
-  }
-
-  private getUserLoggedFromLocalStorage(): any 
-  {   
-    return {
-      user: localStorage.getItem('user'),
-      password : localStorage.getItem('password'),
-      rememberMe: this.stringToBoolean(localStorage.getItem('rememberMe')!)
-    }
-  }
-  
-  private stringToBoolean(value: string): boolean {
-    const lowercaseValue = value.toLowerCase();
-    return lowercaseValue === "true";
   }
 }

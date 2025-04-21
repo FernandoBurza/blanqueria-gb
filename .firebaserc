@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "blanqueria-gb",
+    "gb": "blanqueria-gb"
+  },
+  "targets": {},
+  "etags": {}
+}

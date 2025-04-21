@@ -1,0 +1,46 @@
+<div class="flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden" style="background-image: url('/assets/general/images/login/BaseFondo.png');">    
+    <div class="flex flex-column align-items-center justify-content-center">    
+        <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, #0E2E40 10%, rgba(33, 150, 243, 0) 30%);">
+            <div class="surface-card py-7 px-5 sm:px-6" style="border-radius:53px; width: 350px;">
+                <div class="text-center mb-4">
+                    <div class="logo">
+                        <img src="assets/general/images/login/LogoGTM.svg" alt="Logo" height="70" class="mb-3">
+                    </div>
+                    
+                    <div class="text-3xl font-medium mb-3" style="color:#15455F">¡Regístrate!</div>
+                    <span class="font-medium" style="color:#15455F">Crea tu cuenta para continuar</span>
+                </div>
+
+                <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+                    <label for="username" class="block text-md font-medium mb-2" style="color:#15455F; width: 100%;">Usuario</label>
+                    <input id="username" formControlName="username" type="text" placeholder="Tu usuario" pInputText class="w-full mb-4">
+
+                    <label for="email" class="block text-md font-medium mb-2" style="color:#15455F; width: 100%;">Email</label>
+                    <input id="email" formControlName="email" type="email" placeholder="Tu email" pInputText class="w-full mb-4">
+
+                    <label for="password" class="block font-medium text-md mb-2" style="color:#15455F; width: 100%;">Clave</label>
+                    <p-password id="password" formControlName="password" placeholder="Tu clave" [feedback]="false" [toggleMask]="true" styleClass="w-full mb-5"></p-password>
+
+                    <button pButton pRipple label="Registrarse" [loading]="loading" class="w-full p-3 text-md mb-4" style="color:white; background-color: #1C5C7F;" type="submit"></button>
+                </form>
+
+                <!-- División visual para otros métodos de registro -->
+                <div class="text-center my-4">
+                    <span class="font-medium" style="color:#15455F;">O regístrate con</span>
+                </div>
+
+                <!-- Botones de inicio de sesión con Google y Outlook -->
+                <div class="flex flex-column gap-3">
+                    <button pButton pRipple icon="pi pi-google" label="Google" class="w-full p-3 text-md" style="background-color: #DB4437; color: white;" (click)="onRegisterWithGoogle()"></button>
+                    <button pButton pRipple icon="pi pi-envelope" label="Outlook" class="w-full p-3 text-md" style="background-color: #0072C6; color: white;" (click)="onRegisterWithOutlook()"></button>
+                </div>
+
+                <!-- Enlace para volver al login -->
+                <div class="text-center mt-4">
+                    <span class="text-md" style="color:#15455F;">¿Ya tienes una cuenta?</span>
+                    <a routerLink="/login" class="font-medium no-underline ml-2 text-md cursor-pointer" style="color:#1C5C7F;">Inicia sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

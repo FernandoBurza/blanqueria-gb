@@ -1,28 +1,48 @@
-import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 
-import { AppLayoutComponent } from "./layout/app.layout.component";
+import { AppLayoutComponent } from './layout/app.layout.component';
+import { WalletComponent } from './modules/wallet/wallet.component';
+import { SuccessComponent } from './modules/success/success.component';
+import { ContactoComponent } from './modules/contacto/contacto.component';
+
+// Aquí puedes importar un guard de autenticación si lo tienes
+// import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
-    { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
-    { path: 'auth', loadChildren: () => import('./modules/auth/auth.module').then(m => m.AuthModule) },
-    {
-      path: '',
-      component: AppLayoutComponent,
-      children: [
-        { path: 'dashboard', loadChildren: () => import('./general/components/dashboard/dashboard.module').then(m => m.DashboardModule) },
-        { path: 'importacionConsumos', loadChildren: () => import('./modules/importacionConsumos/importacionConsumos.module').then(m => m.ImportacionConsumosModule) },
-        { path: 'anulacionConsumos', loadChildren: () => import('./modules/anulacionConsumos/anulacionConsumos.module').then(m => m.AnulacionConsumosModule) },
-        { path: 'administracionTarjetas', loadChildren: () => import('./modules/administracionTarjetas/administracionTarjetas.module').then(m => m.AdministracionTarjetasModule) },
-        { path: 'liquidaciones', loadChildren: () => import('./modules/liquidaciones/liquidaciones.module').then(m => m.LiquidacionesModule) },
-        { path: 'ultimosConsumos', loadChildren: () => import('./modules/ultimosConsumos/ultimosConsumos.module').then(m => m.UltimosConsumosModule) },        
-      ]
-    },
-    { path: '**', redirectTo: '/notfound' },
-  ];
-  
-  @NgModule({
-    imports: [RouterModule.forRoot(routes, { useHash: false, scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled', onSameUrlNavigation: 'reload' })],
-    exports: [RouterModule]
-  })
-  export class AppRoutingModule { }
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+
+  {
+    path: '',
+    component: AppLayoutComponent,
+    children: [
+      {
+        path: 'dashboard',
+        loadChildren: () => import('./general/components/dashboard/dashboard.module').then(m => m.DashboardModule),
+        // Si usas un guard de autenticación, descomenta la siguiente línea
+        // canActivate: [AuthGuard], 
+      },
+
+      {
+        path: 'contacto',
+        loadChildren: () => import('./modules/contacto/contacto.module').then(m => m.ContactoModule)
+      },
+      {
+        path: 'tabla-contactos',
+        loadChildren: () => import('./modules/tabla-contactos/tabla-contactos.module').then(m => m.TablaContactosModule)
+      },
+      { path: 'contacto/:id', component: ContactoComponent },
+
+
+
+
+    ]
+  },
+  { path: '**', redirectTo: '/notfound' },
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes, { useHash: false, scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled', onSameUrlNavigation: 'reload' })],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }

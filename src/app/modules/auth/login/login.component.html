@@ -1,35 +1,68 @@
-<div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden" style="background-image: url('assets/general/images/login/fondoLogin.jpg');">    
-    <div class="flex flex-column align-items-center justify-content-center">    
-        <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, #911d22 10%, rgba(33, 150, 243, 0) 30%);">
-            <div class="w-full surface-card py-7 px-5 sm:px-8" style="border-radius:53px">
-                <div class=" text-center mb-5">
-                    <div class="logo">
-                        <img src="assets/general/images/login/isoLogoTipo.svg" alt="Image" height="90" class=" mb-5">
-                    </div>
-                    
-                    <div class="text-3xl font-medium mb-3" style="color:#911d22">¡Bienvenido!</div>
-                    <span class="font-medium" style="color:#911d22">Inicia sesión para continuar</span>
-                </div>
-                <form [formGroup]="loginForm" (ngSubmit)="onLogin()">                   
-                    <label for="user" class="block text-md font-medium mb-2" style="color:#911d22">Usuario</label>
-                    <input id="user" formControlName="user" type="text" placeholder="Tu usuario" pInputText 
-                        class="w-full md:w-23rem mb-5 ng-dirty ng-invalid" style="padding:1rem;" >
+<div class="flex min-h-screen items-top justify-center p-[100px]">
+    <div
+        class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md h-[500px] flex flex-col items-center justify-center"
+    >
+        <!-- Título del formulario -->
+        <h2
+            class="text-5xl text-center text-gray-600 mb-6 font-serif tracking-wide pb-[50px]"
+        >
+            {{ isSignUpMode ? "Crear cuenta" : "Iniciar sesión" }}
+        </h2>
 
-                    <label for="password" class="block font-medium text-md mb-2" style="color:#911d22">Clave</label>
-                    <p-password id="password" formControlName="password" placeholder="Tu clave" [feedback]="false" [toggleMask]="true" 
-                     styleClass="mb-5" inputStyleClass="w-full md:w-23rem p-3 ng-dirty ng-invalid"></p-password>  
-                    <div style="max-width: 320px;">
-                        <p-message *ngIf="errorMessage" severity="info" [text]="errorMessage" styleClass="block text-center mb-5" ></p-message>
-                    </div>
-                    <div class="flex align-items-center justify-content-between mb-5 gap-5">
-                        <div class="flex align-items-center">
-                            <p-checkbox id="rememberMe" formControlName="rememberMe" [binary]="true" styleClass="mr-2"></p-checkbox>
-                            <label class="text-md" for="rememberMe" style="color:#911d22">Recordar acceso</label>
-                        </div>
-                        <a class="font-medium no-underline ml-2 text-md text-right cursor-pointer" style="color:#911d22">¿Olvidaste tu contraseña?</a>
-                    </div>
-                    <button pButton pRipple label="Iniciar sesión" [loading]="loading" class="w-full p-3 text-md" style="color:white; background-color: #c1272d;" type="submit"></button>
-                </form>    
+        <!-- Mensaje de error si existe -->
+        <div
+            *ngIf="errorMessage"
+            class="text-red-500 text-center mb-4 p-2 border border-red-500 rounded-md"
+        >
+            {{ errorMessage }}
+        </div>
+
+        <!-- Campos del formulario -->
+        <div class="space-y-4">
+            <input
+                type="email"
+                [(ngModel)]="email"
+                placeholder="Correo electrónico"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800"
+            />
+            <input
+                type="password"
+                [(ngModel)]="password"
+                placeholder="Contraseña"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800"
+            />
+            <div *ngIf="isSignUpMode">
+                <input
+                    type="password"
+                    [(ngModel)]="confirmPassword"
+                    placeholder="Confirmar contraseña"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800"
+                />
+            </div>
+            <button
+                (click)="login()"
+                class="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-all"
+            >
+                {{ isSignUpMode ? "Crear cuenta" : "Iniciar sesión" }}
+            </button>
+            <div class="text-center text-gray-500 my-2">O</div>
+            <button
+                (click)="loginWithGoogle()"
+                class="w-full bg-red-400 text-white py-3 rounded-lg hover:bg-red-600 transition-all"
+            >
+                Iniciar sesión con Google
+            </button>
+            <div class="text-center mt-4">
+                <p
+                    class="text-sm text-blue-500 cursor-pointer"
+                    (click)="toggleSignUp()"
+                >
+                    {{
+                        isSignUpMode
+                            ? "¿Ya tienes cuenta? Inicia sesión"
+                            : "¿No tienes cuenta? Regístrate"
+                    }}
+                </p>
             </div>
         </div>
     </div>

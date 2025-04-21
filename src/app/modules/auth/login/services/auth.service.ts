@@ -1,81 +1,37 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Auth, signInWithEmailAndPassword, signOut, user } from '@angular/fire/auth';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, map } from 'rxjs';
-import { LoginRequest } from '../models/login-request';
-import { LoginResponse } from '../models/login-response';
-import { environment } from 'src/environments/environment';
-
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
+export class AuthService {
+  authState$: Observable<any>;
 
-/* Basado en los tutoriales:
-    - https://www.positronx.io/angular-jwt-user-authentication-tutorial/ 
-    - https://www.youtube.com/watch?v=9IBNIbgMGdM
-*/
+  constructor(private auth: Auth, private router: Router) {
+    this.authState$ = user(this.auth);
+  }
 
- export class AuthService {
-    
-    private jwtTokenSubject: BehaviorSubject<string> = new BehaviorSubject<string>(localStorage.getItem('jwtToken') || '');
-    private refreshTokenSubject: BehaviorSubject<string> = new BehaviorSubject<string>(localStorage.getItem('refreshToken') || '');
-    private roleSubject: BehaviorSubject<string> = new BehaviorSubject<string>(localStorage.getItem('role') || '');
-    
-    private endpoint: string | undefined;
-    private controller: string = 'auth';
+  async login(email: string, password: string): Promise<any> {
+    try {
+      const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+      return userCredential.user;
+    } catch (error: any) {
+      return Promise.reject(error);
+    }
+  }
 
-    get jwtToken(): Observable<string> {
-      return this.jwtTokenSubject.asObservable();
+  async logout(): Promise<void> {
+    try {
+      await signOut(this.auth);
+      this.router.navigate(['/']);
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
     }
-  
-    get refreshToken(): Observable<string> {
-      return this.refreshTokenSubject.asObservable();
-    }
+  }
 
-    constructor(private httpClient: HttpClient) {
-      this.endpoint = `${environment.domain}${this.controller}`;
-    }
-  
-    login(user: string, password: string) {
-      let loginRequest: LoginRequest = { username: user, password: password }
-        
-      return this.httpClient
-        .post<LoginResponse>(`${this.endpoint}/login`, loginRequest)
-        .pipe(
-            map(response => 
-            {
-                localStorage.setItem('jwtToken', response.token);
-                localStorage.setItem('refreshToken', response.refreshToken);
-
-                localStorage.setItem('role', 'Admin');
-
-                this.jwtTokenSubject.next(response.token);
-                this.refreshTokenSubject.next(response.refreshToken);
-                this.roleSubject.next('Admin');
-            })
-        );
-    }
-    
-    isLoggedIn(): boolean {
-        return !!localStorage.getItem('jwtToken');
-    }
-      
-    refresh() {
-        const url = `${this.endpoint}/validateRefreshToken?refreshToken=${localStorage.getItem('refreshToken')}`;
-        return this.httpClient.patch<any>(url, {})
-        .pipe(map(response => {
-          localStorage.setItem('jwtToken', response.jwtToken);
-          this.jwtTokenSubject.next(response.jwtToken);
-        }));
-    }
-  
-    logout() {
-      localStorage.removeItem('jwtToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('role');
-      this.jwtTokenSubject.next('');
-      this.refreshTokenSubject.next('');
-      this.roleSubject.next('');
-    }
+  get currentUser(): Observable<any | null> {
+    return this.authState$;
+  }
 }

@@ -1,0 +1,97 @@
+/* Container for the entire login form */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    background-color: #f4f7fc; /* Soft background color */
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Title styling */
+h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+    text-align: center;
+}
+
+/* Form input fields */
+input {
+    width: 100%;
+    max-width: 350px;
+    padding: 10px;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+/* Style for the main login button */
+button {
+    width: 100%;
+    max-width: 350px;
+    padding: 10px;
+    background-color: #007bff; /* Bootstrap blue */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* Change background color when hovering over the button */
+button:hover {
+    background-color: #0056b3; /* Darker blue for hover */
+}
+
+/* Buttons for social login (Google & Microsoft) */
+button.social-login {
+    background-color: #db4437; /* Google red */
+    margin-top: 0.5rem;
+}
+
+button.social-login.microsoft {
+    background-color: #0078d4; /* Microsoft blue */
+}
+
+button.social-login:hover {
+    opacity: 0.9;
+}
+
+/* Styling for the social buttons */
+button.social-login {
+    width: 100%;
+    max-width: 350px;
+    padding: 10px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* Center content and add a little spacing */
+.login-container button + button {
+    margin-top: 10px;
+}
+
+input:focus,
+button:focus {
+    outline: none;
+    border-color: #0056b3; /* Focused input and button border */
+}
+
+/* Small margin at the bottom */
+.login-container .footer {
+    margin-top: 2rem;
+    color: #777;
+    font-size: 0.9rem;
+    text-align: center;
+}

@@ -4,6 +4,7 @@ import { MenuItem } from 'primeng/api';
 //import { ProductService } from '../../../service/product.service';
 import { Subscription } from 'rxjs';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
+import { AuthService } from 'src/app/modules/auth/login/services/auth.service';
 
 @Component({
     templateUrl: './dashboard.component.html'
@@ -18,7 +19,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     subscription!: Subscription;
 
-    constructor(public layoutService: LayoutService, private router: Router) {
+    constructor(public layoutService: LayoutService, private router: Router, public authService: AuthService) {
         // this.subscription = this.layoutService.configUpdate$.subscribe(() => {
         //     this.initChart();
         // });

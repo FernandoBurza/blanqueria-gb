@@ -12,3 +12,7 @@ $gutter: 1rem; //for primeflex grid system
 @import "assets/general/styles/flags/flags.css";
 @import "assets/general/styles/badges.scss";
 @import "assets/general/styles/code.scss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

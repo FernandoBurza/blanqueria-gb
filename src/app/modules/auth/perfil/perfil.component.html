@@ -1,0 +1,36 @@
+<!-- src/app/profile/profile.component.html -->
+<div class="flex min-h-screen items-center justify-center bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <!-- Condición para mostrar perfil si el usuario está autenticado -->
+        <!-- Perfil del usuario -->
+        <h2
+            class="text-3xl text-center text-gray-600 mb-6 font-serif tracking-wide"
+        >
+            Mi Cuenta
+        </h2>
+
+        <!-- Mensaje de bienvenida -->
+        <div class="text-center mb-6">
+            <h1 class="text-4xl text-gray-700 font-semibold mb-2">
+                Bienvenido, {{ user?.displayName!.split(" ")[0] || "Usuario" }}!
+            </h1>
+            <img
+                *ngIf="user?.photoURL"
+                [src]="user?.photoURL"
+                alt="Foto de perfil"
+                class="w-32 h-32 rounded-full mx-auto mb-4"
+            />
+            <h3 class="text-xl text-gray-700">
+                {{ user?.displayName || "Usuario sin nombre" }}
+            </h3>
+            <p class="text-gray-500">{{ user?.email }}</p>
+        </div>
+
+        <button
+            (click)="logout()"
+            class="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-all"
+        >
+            Cerrar sesión
+        </button>
+    </div>
+</div>

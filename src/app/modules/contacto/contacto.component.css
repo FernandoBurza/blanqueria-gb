@@ -1,0 +1,10 @@
+.contact-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #646a93;
+}
+
+button:disabled {
+    background-color: #d1d1d1;
+    cursor: not-allowed;
+}

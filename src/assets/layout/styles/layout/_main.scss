@@ -10,7 +10,13 @@ html {
 body {
     font-family: var(--font-family);
     color: var(--text-color);
-    background-color: var(--surface-ground);
+    background: linear-gradient(
+        to bottom right,
+        #229cb5,
+        #114e5b
+    ); /* Degradado de arriba a abajo, personaliza los colores */
+    background-size: 100% 100%; /* Asegura que el degradado cubra toda la página */
+    background-attachment: fixed; /* Hace que el fondo no se mueva al hacer scroll */
     margin: 0;
     padding: 0;
     min-height: 100%;

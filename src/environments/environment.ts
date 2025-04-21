@@ -4,7 +4,16 @@
 
 export const environment = {
   production: false,
-  domain: 'http://localhost:5047/api/'
+  domain: 'http://localhost:5047/api/',
+  firebaseConfig: {
+    apiKey: "AIzaSyCXSAEXXq4eoWO1oPZmbYbynix5a4kOeEs",
+    authDomain: "blanqueria-gb.firebaseapp.com",
+    projectId: "blanqueria-gb",
+    storageBucket: "blanqueria-gb.firebasestorage.app",
+    messagingSenderId: "814635683739",
+    appId: "1:814635683739:web:2c264197e22d7cb16d1b3e",
+    measurementId: "G-SNNQS4TRK7"
+  }
 };
 
 /*
